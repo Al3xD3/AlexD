@@ -59,14 +59,16 @@ class Case:
         assert type in (None, 'M', 'L'), "Le Type n'est ni None, ni 'M', ni 'L'."
         self.multiplicateur = multiplicateur
         self.type = type
+        self.jeton = None
 
     def est_vide(self):
         """
         Vérifie si une case est vide ou pas (jeton_occupant est None ou pas).
         :return: True si la case est vide, False sinon.
         """
-        # À compléter
-        # Mettre votre code ici
+        if self.jeton == None:
+            return True   #case vide
+        return False   #case non-vide
 
     def placer_jeton(self, jeton):
         """
@@ -75,8 +77,9 @@ class Case:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la case est déjà occupée.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert self.est_vide(), "La case est déjà occupée, on ne peut pas placer un nouveau jeton"
+        self.jeton = jeton
+        return
 
     def retirer_jeton(self):
         """
@@ -84,8 +87,10 @@ class Case:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert self.est_vide() == False, "La case est déjà vide, on ne peut pas retirer un jeton"
+        jeton_retirer = self.jeton #va chercher le jeton contenu par la case
+        self.jeton = None #remet la case vide
+        return jeton_retirer  #retourne le jeton
 
     def valeur_jeton(self):
         """
@@ -93,8 +98,8 @@ class Case:
         :return: int, valeur du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert self.est_vide() == False, "La case est vide, impossible de trouver la valeur du jeton"
+        return self.jeton.valeur #retourne la valeur du jeton présent sur la case
 
     def lettre_jeton(self):
         """
@@ -102,8 +107,8 @@ class Case:
         :return: str, lettre du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert self.est_vide() == False, "La case est vide, impossible de trouver la lettre du jeton"
+        return self.jeton.lettre #retourne la valeur du jeton présent sur la case
     
     @property
     def code_couleur(self):
