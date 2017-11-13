@@ -14,8 +14,10 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert lettre == lettre.upper(), "La lettre n'est pas en majuscule."
+        assert 0 <= valeur <= 20, "La valeur doit se situer entre 0 et 20 inclusivement."
+        self.lettre = lettre
+        self.valeur = valeur
 
     def __str__(self):
         """ *** Vous n'avez pas à coder cette méthode ***
