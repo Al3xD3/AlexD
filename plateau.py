@@ -247,8 +247,10 @@ class Plateau:
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de la décodée."
+        index_ligne = ord(code[0]) - ord('A') #A étant ligne 0
+        index_colonne = int(code[1:]) - 1    #1 étant collone 0
+        return (index_ligne, index_colonne)  #retourne tuple
 
     def case_est_vide(self, position_code):
         """
@@ -257,16 +259,21 @@ class Plateau:
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
+        pos_case = self.decode_position(position_code) #va chercher le tuple de la case
+        return self.cases[pos_case[0]][pos_case[1]].est_vide() # utilise le tuple dans la liste de case puis: True si vide False sinon
 
     def est_vide(self):
         """
         Permet de déterminer si le plateau est vide, c'est à dire que toutes les cases sont vides.
         :return: True si le plateau est vide, False sinon.
         """
-        # À compléter
-        # Mettre votre code ici
+        # À compléter  Pas sur que la methode utilise Soit optimal.. a voir plus loin #TODO
+        for ligne in range(Plateau.DIMENSION):
+            for colonne in range(Plateau.DIMENSION):
+                if not self.cases[ligne][colonne].est_vide(): #Case non vide trouve
+                    return False
+        return True # fin de l'iteration de toutes les cases, aucune non-vide trouve
 
     def ajouter_jeton(self, jeton, position_code):
         """
@@ -276,8 +283,11 @@ class Plateau:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
+        assert self.case_est_vide(position_code), "La case n'est pas vide, impossible d'ajoute un jeton."
+        pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
+        self.cases[pos_case[0]][pos_case[1]].placer_jeton(jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
+        return
 
     def retirer_jeton(self, position_code):
         """
@@ -286,8 +296,10 @@ class Plateau:
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
+        assert not self.case_est_vide(position_code), "La case est vide, impossible d'enlever un jeton."
+        pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
+        return self.cases[pos_case[0]][pos_case[1]].retirer_jeton() #appel fonction avec le tuple de la case et retourne le jeton
 
     def cases_adjacentes_occupees(self, position_code):
         """ *** Vous n'avez pas à coder cette méthode ***
