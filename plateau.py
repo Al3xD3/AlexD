@@ -55,8 +55,10 @@ class Case:
         :exception: Levez une exception avec assert si le multiplicateur ne respecte pas
         la condition suivante 1 <= multiplicateur <= 3 ou si le type n'est ni None, ni 'M', ni 'L'.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert 1 <= multiplicateur <= 3 , "Le multiplicateur doit se situer entre 1 et 3 inclusivement."
+        assert type in (None, 'M', 'L'), "Le Type n'est ni None, ni 'M', ni 'L'."
+        self.multiplicateur = multiplicateur
+        self.type = type
 
     def est_vide(self):
         """
