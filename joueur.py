@@ -55,17 +55,20 @@ class Joueur:
         return self.__points
 
     @staticmethod
-    def position_est_valide(pos):
+    def position_est_valide(self, pos):
         """
         Méthode permettant de vérifier si une position sur un chevalet est valide ou pas.
         Valide veut dire que la position est entre 0 et Joueur.TAILLE_CHEVALET (Joueur.TAILLE_CHEVALET étant exclus)
         :param pos: (int) la position à valider
         :return: True si position valide, False sinon
         """
-        if pos >= 0 and pos < Joueur.TAILLE_CHEVALET:
+        if pos is None:
             return True
         else:
-            return False
+            if pos >= 0 and pos < Joueur.TAILLE_CHEVALET:
+                return True
+            else:
+                return False
 
     def position_est_vide(self, pos):
         """
@@ -76,12 +79,14 @@ class Joueur:
         :return: True si la position est vide et False sinon.
         :exception: Levez une exception avec assert si la position n'est pas valide. Pensez à réutiliser Joueur.position_est_valide.
         """
-        assert Joueur.position_est_valide(pos), "La position entrée est invalide"
-        if self.__chevalet[pos] is None:
+        assert Joueur.position_est_valide(self, pos), "La position entrée est invalide"
+        if pos is None:
             return True
         else:
-            return False
-
+            if self.__chevalet[pos] is None:
+                return True
+            else:
+                return False
 
     def ajouter_jeton(self, jeton, pos=None):
         """
@@ -94,10 +99,18 @@ class Joueur:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la position est spécifiée mais n'est pas valide ou si elle n'est pas vide pour y déposer un jeton. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        #assert Joueur.position_est_valide(pos) and Joueur.position_est_vide(pos), "La position est invalide ou est déja occupée"
-        #if Joueur.__chevalet[pos] is None:
-        #    Joueur.__chevalet[pos] == jeton
-        #else:
+        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self, pos) , "La position est invalide ou est déja occupée"
+
+        if pos is None:
+            for i in range(Joueur.TAILLE_CHEVALET):
+                    if self.__chevalet[i] is None:
+                        self.__chevalet[i] = jeton
+                        break
+                    else:
+                        continue
+        else:
+            if self.__chevalet[pos] is None:
+                self.__chevalet[pos] = jeton
 
     def retirer_jeton(self, pos):
         """
@@ -106,8 +119,13 @@ class Joueur:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self, pos), "La position est invalide ou est vide"
+
+        lettre_stockee = self.__chevalet[pos]
+        self.__chevalet[pos] = None
+        return lettre_stockee
+
+
 
     def obtenir_jeton(self, pos):
         """
@@ -116,8 +134,11 @@ class Joueur:
         :return: Le jeton à la position d'intérêt.
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self,pos), "La position est invalide ou est vide"
+
+        return self.__chevalet[pos]
+
+
 
     def ajouter_points(self, points):
         """
@@ -125,8 +146,8 @@ class Joueur:
         :param p: (int) points à ajouter.
         :return: Ne retourne rien.
         """
-        # À compléter
-        # Mettre votre code ici
+
+        self.__points += points
 
     def melanger_jetons(self):
         """
@@ -134,8 +155,7 @@ class Joueur:
         Pensez à utiliser la fonction shuffle du module random.
         :return: Ne retourne rien.
         """
-        # À compléter
-        # Mettre votre code ici
+        shuffle(self.__chevalet)
 
     def __str__(self):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -147,3 +167,4 @@ class Joueur:
         s += "            " + "".join(["{:<3s}".format(str(x)) if x else '  ' for x in self.__chevalet])
         s += "\nChevalet: \_" + "__".join([chr(0x2080 + i + 1) for i in range(self.TAILLE_CHEVALET)]) + '_/\n'
         return s
+
