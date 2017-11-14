@@ -26,10 +26,10 @@ class Joueur:
         :return: Ne retourne rien.
         :exception: Levez une exception si le nom est une chaine vide.
         """
-        assert nom != "", "Nom ne doit pas être une chaîne vide"
+        assert nom != "", "Impossible de retirer un jeton du chevalet, la position est invalide ou est vide"
         self.nom = nom
         self.__points = 0
-        self.__chevalet = [None for i in range(Joueur.TAILLE_CHEVALET)]
+        self.__chevalet = [None for i in range(Joueur.TAILLE_CHEVALET)]  # met None a chaque pos du chevalet
 
     @property
     def nb_a_tirer(self):
@@ -39,12 +39,12 @@ class Joueur:
         :return: (int) Le nombre de places vides dans le chevalet.
         """
         nombre_de_vide = 0
-        for i in self.__chevalet:
-            if i == None:
+        for i in self.__chevalet:  # iteration des pos chevalet
+            if i == None:  # ajoute 1 si pos vide
                 nombre_de_vide += 1
             else:
                 continue
-        return nombre_de_vide
+        return nombre_de_vide # retourne nbre place vide
 
     @property
     def points(self):
@@ -55,20 +55,17 @@ class Joueur:
         return self.__points
 
     @staticmethod
-    def position_est_valide(self, pos):
+    def position_est_valide(pos):
         """
         Méthode permettant de vérifier si une position sur un chevalet est valide ou pas.
         Valide veut dire que la position est entre 0 et Joueur.TAILLE_CHEVALET (Joueur.TAILLE_CHEVALET étant exclus)
         :param pos: (int) la position à valider
         :return: True si position valide, False sinon
         """
-        if pos is None:
+        print()
+        if 0 <= pos < Joueur.TAILLE_CHEVALET:
             return True
-        else:
-            if pos >= 0 and pos < Joueur.TAILLE_CHEVALET:
-                return True
-            else:
-                return False
+        return False
 
     def position_est_vide(self, pos):
         """
@@ -79,14 +76,10 @@ class Joueur:
         :return: True si la position est vide et False sinon.
         :exception: Levez une exception avec assert si la position n'est pas valide. Pensez à réutiliser Joueur.position_est_valide.
         """
-        assert Joueur.position_est_valide(self, pos), "La position entrée est invalide"
-        if pos is None:
+        assert self.position_est_valide(pos), "Impossible de savoir si la position est vide, la position entrée est invalide"
+        if self.__chevalet[pos] is None:
             return True
-        else:
-            if self.__chevalet[pos] is None:
-                return True
-            else:
-                return False
+        return False
 
     def ajouter_jeton(self, jeton, pos=None):
         """
@@ -99,16 +92,13 @@ class Joueur:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la position est spécifiée mais n'est pas valide ou si elle n'est pas vide pour y déposer un jeton. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self, pos) , "La position est invalide ou est déja occupée"
-
-        if pos is None:
-            for i in range(Joueur.TAILLE_CHEVALET):
+        if pos is None: # Cas ou aucune pos est specifie
+            for i in range(self.TAILLE_CHEVALET):
                     if self.__chevalet[i] is None:
                         self.__chevalet[i] = jeton
                         break
-                    else:
-                        continue
-        else:
+        else: # Si une pos est specifie
+            assert self.position_est_valide(pos) and self.position_est_vide(pos), "Impossible d'ajouter un jeton, la position est invalide ou est déja occupée"
             if self.__chevalet[pos] is None:
                 self.__chevalet[pos] = jeton
 
@@ -119,10 +109,9 @@ class Joueur:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self, pos), "La position est invalide ou est vide"
-
-        lettre_stockee = self.__chevalet[pos]
-        self.__chevalet[pos] = None
+        assert self.position_est_valide(pos) and not self.position_est_vide(pos), "Impossible d'enlever un jeton, la position est invalide ou est vide"
+        lettre_stockee = self.__chevalet[pos] #lettre contenua la pos
+        self.__chevalet[pos] = None # met la pos a vide
         return lettre_stockee
 
 
@@ -134,8 +123,7 @@ class Joueur:
         :return: Le jeton à la position d'intérêt.
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        assert Joueur.position_est_valide(self, pos) and Joueur.position_est_vide(self,pos), "La position est invalide ou est vide"
-
+        assert self.position_est_valide(pos) and not self.position_est_vide(pos), "Impossible d'obtenir le jeton, la position est invalide ou est vide"
         return self.__chevalet[pos]
 
 
@@ -146,7 +134,6 @@ class Joueur:
         :param p: (int) points à ajouter.
         :return: Ne retourne rien.
         """
-
         self.__points += points
 
     def melanger_jetons(self):
