@@ -66,8 +66,9 @@ class Scrabble:
         :param mot: str, mot à vérifier.
         :return: bool, True si le mot est dans le dictionnaire, False sinon.
         """
-        # À compléter
-        # Mettre votre code ici
+        if mot.upper() in self.dictionnaire:
+            return True
+        return False
 
     def determiner_gagnant(self):
         """
