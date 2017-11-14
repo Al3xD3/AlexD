@@ -364,8 +364,14 @@ class Plateau:
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert self.valider_positions_avant_ajout(position_codes), "Les codes de position sont invalide, impossible de placer le mot."
+        for n in range(len(jetons_a_ajouter)):  # boucle entre tout les jetons disponibles pour ajout
+            self.ajouter_jeton(jetons_a_ajouter[n], position_codes[n])   # ajout des jetons a chaque pos, format fait par fonction direct
+        return self.mots_score_obtenus(position_codes) # fonction retourne liste mot + score
+            
+            
+            
+            
 
     def mots_score_obtenus(self, nouvelles_positions):
         """ *** Vous n'avez pas à coder cette méthode ***
