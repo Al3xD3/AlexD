@@ -98,8 +98,9 @@ class Scrabble:
         Returns:
             bool: True si la partie est terminée, et False autrement.
         """
-        # À compléter
-        # Mettre votre code ici
+        if self.jetons_libres < 1 or self.joueurs < 2:
+            return True
+        return False
 
     def joueur_suivant(self):
         """
@@ -107,8 +108,18 @@ class Scrabble:
         Le nouveau joueur actif est celui à l'index du (joueur courant + 1)% nb_joueurs.
         Si on n'a aucun joueur actif, on détermine au harsard le suivant.
         """
-        # À compléter
-        # Mettre votre code ici
+        if self.joueur_actif is None:
+            self.joueur_actif = self.joueurs[randint(0, len(self.joueurs) - 1)] # joueur au hasard, sera incr de 1 avant return
+        for i in range( 0,len(self.joueurs)):
+            if self.joueurs[i].nom == self.joueur_actif.nom: #trouve le bon joueur en comparant son nom
+                if i == len(self.joueurs) - 1:  #dernier atteint retourne au depart
+                    self.joueur_actif = self.joueurs[0]
+                    break
+                else:
+                    self.joueur_actif = self.joueurs[i + 1] #set le prochain joueur comme etant actif
+                    break
+        return
+
 
     def tirer_jetons(self, n):
         """
@@ -118,8 +129,15 @@ class Scrabble:
         :return: Jeton list, la liste des jetons tirés.
         :exception: Levez une exception avec assert si n ne respecte pas la condition 0 <= n <= 7.
         """
-        # À compléter
-        # Mettre votre code ici
+        assert 0 <= n <= 7, "Impossible de tirer les jetons, le nombre entrée est invalide"
+        #TODO double check if the amount of jeton left is sufficient could add:
+        # if n > len(self.jetons_libres) - 1:
+        #     n = len(self.jetons_libres) - 1
+        pige = []
+        self.jetons_libres = shuffle(self.jetons_libres)
+        for i in range(0,n):
+            pige += self.jetons_libres.pop #retire dernier item de la liste et l'ajoute a la pige
+        return pige
 
     def demander_positions(self):
         """ *** Vous n'avez pas à coder cette méthode ***
