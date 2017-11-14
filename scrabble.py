@@ -77,8 +77,17 @@ class Scrabble:
 
         :return: Joueur, un des joueurs gagnants, i.e si plusieurs sont à égalité on prend un au hasard.
         """
-        # À compléter
-        # Mettre votre code ici
+        gagnant = None
+        point_gagnant = -1
+        for joueur in self.joueurs:
+            if joueur.points < point_gagnant: # Saute le reste de la loop si point inferieur
+                continue
+            if joueur.points == point_gagnant:
+                if random.choice([True, False]): #Si egalite, 50% de chance de conserver un ou l'autre
+                    continue
+            gagnant = joueur #conserve le joueur gagnant
+            point_gagnant = joueur.points #conserve le pointage gagnant
+        return gagnant
 
     def partie_terminee(self):
         """
