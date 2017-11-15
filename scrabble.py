@@ -98,7 +98,7 @@ class Scrabble:
         Returns:
             bool: True si la partie est terminée, et False autrement.
         """
-        if self.jetons_libres < 1 or self.joueurs < 2:
+        if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
             return True
         return False
 
