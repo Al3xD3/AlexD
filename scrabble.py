@@ -213,8 +213,23 @@ class Scrabble:
         Enfin, on remet des jetons pris chez le joueur parmi les jetons libres.
         :return: Ne retourne rien.
         """
-        # À compléter
-        # Mettre votre code ici
+        while True: # boucle d'input
+            swap_jeton = str(input('Saisir la position des jetons a changer séparés par un espace: ')).split(' ')
+            for pos in swap_jeton:
+                if not Joueur.position_est_valide(int(pos)):
+                    print('Erreur de saisie, essayez a nouveau')
+                    valide = False
+                    break
+                else:
+                    valide = True
+            if valide: # fin de l'iteration avec un valide donc tous ok
+                break
+        for pos in swap_jeton:
+            self.jetons_libres.append(self.joueur_actif.retirer_jeton(pos)) #retire jeton et lajoute a la liste des disponibles
+        jeton_pigee = self.tirer_jetons(len(swap_jeton))
+        for i in range(0, len(jeton_pigee)):
+            self.joueur_actif.ajouter_jeton(jeton_pigee[i])
+        return
 
     def jouer(self):
         """
