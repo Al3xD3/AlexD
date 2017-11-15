@@ -368,10 +368,6 @@ class Plateau:
         for n in range(len(jetons_a_ajouter)):  # boucle entre tout les jetons disponibles pour ajout
             self.ajouter_jeton(jetons_a_ajouter[n], position_codes[n])   # ajout des jetons a chaque pos, format fait par fonction direct
         return self.mots_score_obtenus(position_codes) # fonction retourne liste mot + score
-            
-            
-            
-            
 
     def mots_score_obtenus(self, nouvelles_positions):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -384,11 +380,11 @@ class Plateau:
         lignes, cols = zip(*positions_decodees)
         mots = []
         for ligne in set(lignes):
-            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(positions_decodees, ligne)
+            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(nouvelles_positions, ligne)
             mots += lmots
             score_total += score
         for col in set(cols):
-            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(positions_decodees, colonne=col)
+            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(nouvelles_positions, colonne=col)
             mots += lmots
             score_total += score
         return mots, score_total
@@ -458,3 +454,6 @@ class Plateau:
             chaine += "{:^5d}".format(colonne+1)
         chaine += '\n'
         return chaine
+
+M = Jeton('Z',1)
+print(M)
