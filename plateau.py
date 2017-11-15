@@ -259,7 +259,7 @@ class Plateau:
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
+        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
         pos_case = self.decode_position(position_code) #va chercher le tuple de la case
         return self.cases[pos_case[0]][pos_case[1]].est_vide() # utilise le tuple dans la liste de case puis: True si vide False sinon
 

@@ -140,10 +140,10 @@ class Scrabble:
         # if n > len(self.jetons_libres) - 1:
         #     n = len(self.jetons_libres) - 1
         pige = []
-        self.jetons_libres = shuffle(self.jetons_libres)
+        shuffle(self.jetons_libres)
         for i in range(0,n):
-            pige = pige.append(self.jetons_libres[0])
-            del self.jetons_libres[0]
+            pige.append(self.jetons_libres[-1])
+            del self.jetons_libres[-1]
             #retire premier item de la liste et l'ajoute a la pige
         return pige
 
@@ -235,7 +235,7 @@ class Scrabble:
             if valide: # fin de l'iteration avec un valide donc tous ok
                 break
         for pos in swap_jeton:
-            self.jetons_libres.append(self.joueur_actif.retirer_jeton(pos)) #retire jeton et lajoute a la liste des disponibles
+            self.jetons_libres.append(self.joueur_actif.retirer_jeton(int(pos))) #retire jeton et lajoute a la liste des disponibles
         jeton_pigee = self.tirer_jetons(len(swap_jeton))
         for i in range(0, len(jeton_pigee)):
             self.joueur_actif.ajouter_jeton(jeton_pigee[i])
