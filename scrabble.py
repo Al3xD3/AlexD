@@ -226,7 +226,7 @@ class Scrabble:
         while True: # boucle d'input
             swap_jeton = str(input('Saisir la position des jetons a changer séparés par un espace: ')).split(' ')
             for pos in swap_jeton:
-                if not Joueur.position_est_valide(int(pos)):
+                if not Joueur.position_est_valide(int(pos) - 1):
                     print('Erreur de saisie, essayez a nouveau')
                     valide = False
                     break
@@ -235,7 +235,7 @@ class Scrabble:
             if valide: # fin de l'iteration avec un valide donc tous ok
                 break
         for pos in swap_jeton:
-            self.jetons_libres.append(self.joueur_actif.retirer_jeton(int(pos))) #retire jeton et lajoute a la liste des disponibles
+            self.jetons_libres.append(self.joueur_actif.retirer_jeton(int(pos) - 1)) #retire jeton et lajoute a la liste des disponibles
         jeton_pigee = self.tirer_jetons(len(swap_jeton))
         for i in range(0, len(jeton_pigee)):
             self.joueur_actif.ajouter_jeton(jeton_pigee[i])
