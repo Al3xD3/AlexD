@@ -78,6 +78,7 @@ class Scrabble:
 
         :return: Joueur, un des joueurs gagnants, i.e si plusieurs sont à égalité on prend un au hasard.
         """
+
         point_gagnant = -1  # Valeur arbitraire negative initiale pour comparaison
         for joueur in self.joueurs:
             if joueur.points > point_gagnant:  # Si on a un nouveau gagnant
@@ -134,9 +135,9 @@ class Scrabble:
         :exception: Levez une exception avec assert si n ne respecte pas la condition 0 <= n <= 7.
         """
         assert 0 <= n <= 7, "Impossible de tirer les jetons, le nombre entrée est invalide"
-        #TODO double check if the amount of jeton left is sufficient could add:
-        # if n > len(self.jetons_libres) - 1:
-        #     n = len(self.jetons_libres) - 1
+        # double check if the amount of jeton left is sufficient
+        if n > len(self.jetons_libres) - 1:
+             n = len(self.jetons_libres) - 1
         pige = []
         shuffle(self.jetons_libres)
         for i in range(0,n):

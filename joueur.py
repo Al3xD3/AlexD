@@ -100,6 +100,7 @@ class Joueur:
             assert self.position_est_valide(pos) and self.position_est_vide(pos), "Impossible d'ajouter un jeton, la position est invalide ou est déja occupée"
             if self.__chevalet[pos] is None:
                 self.__chevalet[pos] = jeton
+        return
 
     def retirer_jeton(self, pos):
         """
@@ -134,6 +135,7 @@ class Joueur:
         :return: Ne retourne rien.
         """
         self.__points += points
+        return
 
     def melanger_jetons(self):
         """
@@ -142,6 +144,7 @@ class Joueur:
         :return: Ne retourne rien.
         """
         shuffle(self.__chevalet)
+        return
 
     def __str__(self):
         """ *** Vous n'avez pas à coder cette méthode ***
