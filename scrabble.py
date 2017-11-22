@@ -136,8 +136,8 @@ class Scrabble:
         """
         assert 0 <= n <= 7, "Impossible de tirer les jetons, le nombre entrée est invalide"
         # double check if the amount of jeton left is sufficient
-        if n > len(self.jetons_libres) - 1:
-             n = len(self.jetons_libres) - 1
+        if n > len(self.jetons_libres):
+             n = len(self.jetons_libres)
         pige = []
         shuffle(self.jetons_libres)
         for i in range(0,n):
