@@ -106,8 +106,7 @@ class Scrabble:
         Si on n'a aucun joueur actif, on détermine au harsard le suivant.
         """
         if self.joueur_actif is None:
-            self.joueur_actif = self.joueurs[
-                randint(0, len(self.joueurs) - 1)]  # joueur au hasard, sera incr de 1 avant return
+            self.joueur_actif = self.joueurs[randint(0, len(self.joueurs) - 1)]  # joueur au hasard, sera incr de 1 avant return
         for i in range(0, len(self.joueurs)):
             if self.joueurs[i].nom == self.joueur_actif.nom:  # trouve le bon joueur en comparant son nom
                 if i == len(self.joueurs) - 1:  # dernier atteint retourne au depart
@@ -148,17 +147,14 @@ class Scrabble:
         """
         valide = False
         while not valide:
-            input_pos_chevalet = input(
-                "Entrez les positions du chevalet à jouer séparées par un espace: ").upper().strip()
+            input_pos_chevalet = input("Entrez les positions du chevalet à jouer séparées par un espace: ").upper().strip()
             pos_chevalet = [int(x) - 1 for x in input_pos_chevalet.split(' ')]
             valide = all([Joueur.position_est_valide(pos) for pos in pos_chevalet])
 
         valide = False
         while not valide:
-            input_pos_plateau = input(
-                "Entrez les positions de chacune de ces lettres séparées par un espace: ").upper().strip()
+            input_pos_plateau = input( "Entrez les positions de chacune de ces lettres séparées par un espace: ").upper().strip()
             pos_plateau = input_pos_plateau.split(' ')
-
             if len(pos_chevalet) != len(pos_plateau):
                 print("Les nombres de jetons et de positions ne sont pas les mêmes.")
                 valide = False
@@ -224,8 +220,7 @@ class Scrabble:
             if valide:  # fin de l'iteration avec un valide donc tous ok
                 break
         for pos in swap_jeton: #pour chacune des positions demandée retirer le jeton au chevalet et l'ajouter aux jetons disponibles
-            self.jetons_libres.append(
-                self.joueur_actif.retirer_jeton(int(pos) - 1))
+            self.jetons_libres.append( self.joueur_actif.retirer_jeton(int(pos) - 1))
         jeton_pigee = self.tirer_jetons(len(swap_jeton))    #c'est ensuite une pige aléatoire de jeton selon la métode tirer_jeton
         for i in range(0, len(jeton_pigee)):
             self.joueur_actif.ajouter_jeton(jeton_pigee[i])
