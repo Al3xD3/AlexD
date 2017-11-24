@@ -1,11 +1,11 @@
 class Jeton:
     """
     Cette classe représente un jeton.
-
     Les attributs d'un jeton sont:
     - lettre: str, représentant la lettre écrite sur le jeton. Par convention toutes les lettres au scrabble sont en majuscules. Dans ce travail nous ne considérons pas les jetons jokers qui n'ont aucune lettre inscrite.
     - valeur: int, compris entre 0 et 20 inclusivement et représentant le nombre de points associé au jeton.
     """
+
     def __init__(self, lettre, valeur):
         """
         Constructeur de la classe. Permet de créer un Jeton à partir d'une lettre et d'un nombre de points
@@ -16,8 +16,8 @@ class Jeton:
         """
         assert lettre == lettre.upper(), "La lettre n'est pas en majuscule."
         assert 0 <= valeur <= 20, "La valeur doit se situer entre 0 et 20 inclusivement."
-        self.lettre = lettre
-        self.valeur = valeur
+        self.lettre = lettre  #défini un attribut de la classe Jeton : lettre
+        self.valeur = valeur    #défini un second attribut de la classe Jeton : valeur de ce jeton en points
 
     def __str__(self):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -27,14 +27,13 @@ class Jeton:
         if self.valeur < 10:
             res = "{}{}".format(self.lettre, chr(0x2080 + self.valeur))
         else:
-            res = "{}{}{}".format(self.lettre, chr(0x2080 + int(self.valeur/10)), chr(0x2080 + int(self.valeur%10)))
+            res = "{}{}{}".format(self.lettre, chr(0x2080 + int(self.valeur / 10)), chr(0x2080 + int(self.valeur % 10)))
         return res
 
 
 class Case:
     """
     Cette classe représente une case sur un tableau de scrabble.
-
     Les attributs d'une case sont:
     - multiplicateur: int, >= 1 et <= 3.
                         Si la case n'est pas spéciale son multiplicateur de points est de 1.
@@ -55,10 +54,10 @@ class Case:
         :exception: Levez une exception avec assert si le multiplicateur ne respecte pas
         la condition suivante 1 <= multiplicateur <= 3 ou si le type n'est ni None, ni 'M', ni 'L'.
         """
-        assert 1 <= multiplicateur <= 3 , "Le multiplicateur doit se situer entre 1 et 3 inclusivement."
+        assert 1 <= multiplicateur <= 3, "Le multiplicateur doit se situer entre 1 et 3 inclusivement."
         assert type in (None, 'M', 'L'), "Le Type n'est ni None, ni 'M', ni 'L'."
         self.multiplicateur = multiplicateur
-        self.type = type
+        self.type = type #définit deux attributs de la classe Case
         self.jeton_occupant = None
 
     def est_vide(self):
@@ -67,8 +66,8 @@ class Case:
         :return: True si la case est vide, False sinon.
         """
         if self.jeton_occupant == None:
-            return True   #case vide
-        return False   #case non-vide
+            return True  # case vide
+        return False  # case non-vide
 
     def placer_jeton(self, jeton):
         """
@@ -88,9 +87,9 @@ class Case:
         :exception: Levez une exception avec assert si la case est vide.
         """
         assert self.est_vide() == False, "La case est déjà vide, on ne peut pas retirer un jeton"
-        jeton_retirer = self.jeton_occupant #va chercher le jeton contenu par la case
-        self.jeton_occupant = None #remet la case vide
-        return jeton_retirer  #retourne le jeton
+        jeton_retirer = self.jeton_occupant  # va chercher le jeton contenu par la case
+        self.jeton_occupant = None  # remet la case vide
+        return jeton_retirer  # retourne le jeton
 
     def valeur_jeton(self):
         """
@@ -99,7 +98,7 @@ class Case:
         :exception: Levez une exception avec assert si la case est vide.
         """
         assert self.est_vide() == False, "La case est vide, impossible de trouver la valeur du jeton"
-        return self.jeton_occupant.valeur #retourne la valeur du jeton présent sur la case
+        return self.jeton_occupant.valeur  # retourne la valeur du jeton présent sur la case
 
     def lettre_jeton(self):
         """
@@ -108,8 +107,8 @@ class Case:
         :exception: Levez une exception avec assert si la case est vide.
         """
         assert self.est_vide() == False, "La case est vide, impossible de trouver la lettre du jeton"
-        return self.jeton_occupant.lettre #retourne la valeur du jeton présent sur la case
-    
+        return self.jeton_occupant.lettre  # retourne la valeur du jeton présent sur la case
+
     @property
     def code_couleur(self):
         """  *** Vous n'avez pas à coder cette méthode ***
@@ -174,17 +173,14 @@ class Plateau:
         O |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    | O
           +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
              1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
-
     Nous avons un attribut de classe:
     - DIMENSION qui représente la dimension (nombre de lignes ou de colonnes) pour le plateu de scrabble. Par défaut sa valeur est de 15.
-
     Un plateau de scrabble a pour attribut:
     - cases: Case list list, une liste de liste de cases.
             Le programmeur peut avoir accès et manipuler les cases du plateau avec des indexes i et j, tels que 0 <= i < Plateau.DIMENSION et 0 <= i < Plateau.DIMENSION.
             Pour vous aider un peu:
                 * cases[i] vous retourne la i+1 ème ligne du plateau. (L'index i == 0 correspond donc à la première ligne, et ainsi de suite).
                 * cases[i][j] vous donne la case au croisement de la i+1 ème ligne et de la j+1 ème colonne du plateau. (L'index j == 0 correspond donc à la première colonne, et ainsi de suite).
-
             L'utilisateur de la classe, désignera les cases grâce à un code au format « XY » où X représente une lettre comprise entre 'A' et 'O', et Y un nombre compris entre 1 et 15. Ex: K9, E15.
             - La lettre désigne une ligne: 'A' pour la 1ère ligne, B pour la seconde ligne, etc.
             - Le nombre désigne une colonne: 5 correspond à la 5ème colonne.
@@ -220,7 +216,6 @@ class Plateau:
             self.cases[7 + i][7 + j] = Case(2, 'L')
         self.cases[7][7] = Case(2, 'M')
 
-
     @staticmethod
     def code_position_est_valide(code):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -241,16 +236,14 @@ class Plateau:
         """
         Méthode statique servant à transformer un code de positionnement sur le plateau
         en index d'accès de ligne et de colonne sur le plateau.
-
         :param s: str au format « XY » ou « xy » représentant un code de positionnement.
-
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de la décodée."
-        index_ligne = ord(code[0]) - ord('A') #A étant ligne 0
-        index_colonne = int(code[1:]) - 1    #1 étant collone 0
-        return (index_ligne, index_colonne)  #retourne tuple
+        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de la décoder."
+        index_ligne = ord(code[0]) - ord('A')  # A étant ligne 0
+        index_colonne = int(code[1:]) - 1  # 1 étant colonne 0
+        return (index_ligne, index_colonne)  # retourne tuple
 
     def case_est_vide(self, position_code):
         """
@@ -259,21 +252,22 @@ class Plateau:
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
-        pos_case = self.decode_position(position_code) #va chercher le tuple de la case
-        return self.cases[pos_case[0]][pos_case[1]].est_vide() # utilise le tuple dans la liste de case puis: True si vide False sinon
+        assert Plateau.code_position_est_valide(
+            position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
+        pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
+        return self.cases[pos_case[0]][
+            pos_case[1]].est_vide()  # utilise le tuple dans la liste de case puis: True si vide False sinon
 
     def est_vide(self):
         """
         Permet de déterminer si le plateau est vide, c'est à dire que toutes les cases sont vides.
         :return: True si le plateau est vide, False sinon.
         """
-        # À compléter  Pas sur que la methode utilise Soit optimal.. a voir plus loin #TODO
         for ligne in range(Plateau.DIMENSION):
             for colonne in range(Plateau.DIMENSION):
-                if not self.cases[ligne][colonne].est_vide(): #Case non vide trouve
+                if not self.cases[ligne][colonne].est_vide():  # Case non vide trouve
                     return False
-        return True # fin de l'iteration de toutes les cases, aucune non-vide trouve
+        return True  # fin de l'iteration de toutes les cases, aucune non-vide trouve
 
     def ajouter_jeton(self, jeton, position_code):
         """
@@ -283,10 +277,12 @@ class Plateau:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
+        assert Plateau.code_position_est_valide(
+            position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
         assert self.case_est_vide(position_code), "La case n'est pas vide, impossible d'ajoute un jeton."
         pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        self.cases[pos_case[0]][pos_case[1]].placer_jeton(jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
+        self.cases[pos_case[0]][pos_case[1]].placer_jeton(
+            jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
         return
 
     def retirer_jeton(self, position_code):
@@ -296,10 +292,12 @@ class Plateau:
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
+        assert Plateau.code_position_est_valide(
+            position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
         assert not self.case_est_vide(position_code), "La case est vide, impossible d'enlever un jeton."
         pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        return self.cases[pos_case[0]][pos_case[1]].retirer_jeton() #appel fonction avec le tuple de la case et retourne le jeton
+        return self.cases[pos_case[0]][
+            pos_case[1]].retirer_jeton()  # appel fonction avec le tuple de la case et retourne le jeton
 
     def cases_adjacentes_occupees(self, position_code):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -311,7 +309,8 @@ class Plateau:
         :exception: Levez une exception avec assert si le code de la position est invalide
         """
         index_ligne, index_colonne = Plateau.decode_position(position_code)
-        voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne), (index_ligne - 1, index_colonne)]
+        voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne),
+                   (index_ligne - 1, index_colonne)]
         voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION)
                    and (0 <= j < Plateau.DIMENSION)]
         return any([not self.cases[i][j].est_vide() for (i, j) in voisins])
@@ -364,10 +363,12 @@ class Plateau:
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        assert self.valider_positions_avant_ajout(position_codes), "Les codes de position sont invalide, impossible de placer le mot."
-        for n in range(len(jetons_a_ajouter)):  # boucle entre tout les jetons disponibles pour ajout
-            self.ajouter_jeton(jetons_a_ajouter[n], position_codes[n])   # ajout des jetons a chaque pos, format fait par fonction direct
-        return self.mots_score_obtenus(position_codes) # fonction retourne liste mot + score
+        assert self.valider_positions_avant_ajout(
+            position_codes), "Les codes de position sont invalide, impossible de placer le mot."
+        for n in range(len(jetons_a_ajouter)):  # boucle entre tous les jetons disponibles pour ajout
+            self.ajouter_jeton(jetons_a_ajouter[n],
+                               position_codes[n])  # ajout des jetons a chaque pos, format fait par fonction direct
+        return self.mots_score_obtenus(position_codes)  # fonction retourne liste mot + score
 
     def mots_score_obtenus(self, nouvelles_positions):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -436,11 +437,11 @@ class Plateau:
         ligne_separation = '  +' + '----+' * Plateau.DIMENSION + '\n'
         chaine = '   '
         for colonne in range(Plateau.DIMENSION):
-            chaine += "{:^5d}".format(colonne+1)
+            chaine += "{:^5d}".format(colonne + 1)
         chaine += '\n'
         chaine += ligne_separation
         for rangee in range(Plateau.DIMENSION):
-            chaine += '{} |'.format(chr(ord('A')+rangee))
+            chaine += '{} |'.format(chr(ord('A') + rangee))
             for colonne in range(Plateau.DIMENSION):
                 if rangee == colonne and rangee == 7 and self.cases[rangee][colonne].est_vide():
                     s = "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.cases[rangee][colonne].code_couleur, '\u2605')
@@ -451,6 +452,6 @@ class Plateau:
             chaine += ligne_separation
         chaine += '   '
         for colonne in range(Plateau.DIMENSION):
-            chaine += "{:^5d}".format(colonne+1)
+            chaine += "{:^5d}".format(colonne + 1)
         chaine += '\n'
         return chaine
