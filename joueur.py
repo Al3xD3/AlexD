@@ -60,7 +60,6 @@ class Joueur:
         :param pos: (int) la position à valider
         :return: True si position valide, False sinon
         """
-        print()
         if 0 <= pos < Joueur.TAILLE_CHEVALET: #permet de déterminer si le numéro de la position est dans la braquette acceptée
             return True
         return False
