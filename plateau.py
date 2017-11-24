@@ -252,11 +252,9 @@ class Plateau:
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        assert Plateau.code_position_est_valide(
-            position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
+        assert Plateau.code_position_est_valide( position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
         pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        return self.cases[pos_case[0]][
-            pos_case[1]].est_vide()  # utilise le tuple dans la liste de case puis: True si vide False sinon
+        return self.cases[pos_case[0]][pos_case[1]].est_vide()  # utilise le tuple dans la liste de case puis: True si vide False sinon
 
     def est_vide(self):
         """
@@ -277,12 +275,10 @@ class Plateau:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(
-            position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
+        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
         assert self.case_est_vide(position_code), "La case n'est pas vide, impossible d'ajoute un jeton."
         pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        self.cases[pos_case[0]][pos_case[1]].placer_jeton(
-            jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
+        self.cases[pos_case[0]][pos_case[1]].placer_jeton(jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
         return
 
     def retirer_jeton(self, position_code):
@@ -292,12 +288,10 @@ class Plateau:
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(
-            position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
+        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
         assert not self.case_est_vide(position_code), "La case est vide, impossible d'enlever un jeton."
         pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        return self.cases[pos_case[0]][
-            pos_case[1]].retirer_jeton()  # appel fonction avec le tuple de la case et retourne le jeton
+        return self.cases[pos_case[0]][pos_case[1]].retirer_jeton()  # appel fonction avec le tuple de la case et retourne le jeton
 
     def cases_adjacentes_occupees(self, position_code):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -309,8 +303,7 @@ class Plateau:
         :exception: Levez une exception avec assert si le code de la position est invalide
         """
         index_ligne, index_colonne = Plateau.decode_position(position_code)
-        voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne),
-                   (index_ligne - 1, index_colonne)]
+        voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne), (index_ligne - 1, index_colonne)]
         voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION)
                    and (0 <= j < Plateau.DIMENSION)]
         return any([not self.cases[i][j].est_vide() for (i, j) in voisins])
@@ -363,11 +356,9 @@ class Plateau:
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        assert self.valider_positions_avant_ajout(
-            position_codes), "Les codes de position sont invalide, impossible de placer le mot."
+        assert self.valider_positions_avant_ajout(position_codes), "Les codes de position sont invalide, impossible de placer le mot."
         for n in range(len(jetons_a_ajouter)):  # boucle entre tous les jetons disponibles pour ajout
-            self.ajouter_jeton(jetons_a_ajouter[n],
-                               position_codes[n])  # ajout des jetons a chaque pos, format fait par fonction direct
+            self.ajouter_jeton(jetons_a_ajouter[n], position_codes[n])  # ajout des jetons a chaque pos, format fait par fonction direct
         return self.mots_score_obtenus(position_codes)  # fonction retourne liste mot + score
 
     def mots_score_obtenus(self, nouvelles_positions):
