@@ -4,8 +4,10 @@ from random import shuffle
 class Joueur:
     """
     Cette classe permet de représenter un joueur.
+
     La classe joueur possède une variable de classe:
     - TAILLE_CHEVALET : le nombre de jetons maximum qu'un joueur peut avoir.
+
     Un joueur a 3 attributs:
     - nom (str, public): représente le nom du joueur doit être non vide.
     - __points (entier, privé): représente le nombre de points que le joueur détient.
@@ -50,7 +52,7 @@ class Joueur:
         Méthode permettant d'obtenir le nombre de points du joueur.
         :return: (int) Le nombre de points du joueur.
         """
-        return self.__points #retourne le nombre de points du joueur
+        return self.__points
 
     @staticmethod
     def position_est_valide(pos):
@@ -60,7 +62,7 @@ class Joueur:
         :param pos: (int) la position à valider
         :return: True si position valide, False sinon
         """
-        if 0 <= pos < Joueur.TAILLE_CHEVALET: #permet de déterminer si le numéro de la position est dans la braquette acceptée
+        if 0 <= pos < Joueur.TAILLE_CHEVALET:
             return True
         return False
 
@@ -90,14 +92,15 @@ class Joueur:
         :exception: Levez une exception avec assert si la position est spécifiée mais n'est pas valide ou si elle n'est pas vide pour y déposer un jeton. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
         if pos is None: # Cas ou aucune pos est specifie
-            for i in range(self.TAILLE_CHEVALET): #si la position est vide on ajoute le jeton à cette position en commencant à 0 soit à gauche
+            for i in range(self.TAILLE_CHEVALET):
                     if self.__chevalet[i] is None:
                         self.__chevalet[i] = jeton
                         break
         else: # Si une pos est specifie
             assert self.position_est_valide(pos) and self.position_est_vide(pos), "Impossible d'ajouter un jeton, la position est invalide ou est déja occupée"
-            if self.__chevalet[pos] is None: #si la position est none on la rend égale au nouveau jeton
+            if self.__chevalet[pos] is None:
                 self.__chevalet[pos] = jeton
+        return
 
     def retirer_jeton(self, pos):
         """
@@ -107,7 +110,7 @@ class Joueur:
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
         assert self.position_est_valide(pos) and not self.position_est_vide(pos), "Impossible d'enlever un jeton, la position est invalide ou est vide"
-        lettre_stockee = self.__chevalet[pos] #lettre contenu a la pos
+        lettre_stockee = self.__chevalet[pos] #lettre contenua la pos
         self.__chevalet[pos] = None # met la pos a vide
         return lettre_stockee
 
@@ -121,7 +124,7 @@ class Joueur:
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
         assert self.position_est_valide(pos) and not self.position_est_vide(pos), "Impossible d'obtenir le jeton, la position est invalide ou est vide"
-        return self.__chevalet[pos] #retourne le jeton à la postion pos
+        return self.__chevalet[pos]
 
 
 
@@ -132,6 +135,7 @@ class Joueur:
         :return: Ne retourne rien.
         """
         self.__points += points
+        return
 
     def melanger_jetons(self):
         """
@@ -140,6 +144,7 @@ class Joueur:
         :return: Ne retourne rien.
         """
         shuffle(self.__chevalet)
+        return
 
     def __str__(self):
         """ *** Vous n'avez pas à coder cette méthode ***
