@@ -117,8 +117,8 @@ class Scrabble(Tk):
         self.plateau = Plateau(self, 30)
         self.plateau.grid(row=1, column=2, columnspan=4,rowspan=18)
 
-
         #init joueur
+        self.changer_joueur = True
         self.joueur_actif = None
         #TODO Methode pour nommer nos joueur dynamiquement
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
@@ -127,7 +127,6 @@ class Scrabble(Tk):
         self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12)).grid(row=1, column=0,pady=2,padx=2)
         self.text_score_joueur = StringVar()
         self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11)).grid(row=2, column=0, pady=2,padx=2,rowspan=4)
-
 
         #portion joueur
         self.text_joueur_actif = StringVar()
@@ -138,6 +137,7 @@ class Scrabble(Tk):
         self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22,column=2)
         self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22, column=3)
         self.boutton_placer = Button(self, text="Placer Jeton", command=self.choix_placer_jeton).grid(row=22, column=5)
+        self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner).grid(row=22, column=4)
 
         #signature
         self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6)).grid(row=23, column=6,pady=2,padx=2,columnspan=2)
@@ -176,20 +176,41 @@ class Scrabble(Tk):
             self.joueur_actif.ajouter_jeton(jeton)
         self.update_board()
 
+    def prochain_tour(self):
+        #Verif si fin de parti
+        if self.partie_terminee():
+            print("partie terminer... TODO implement display \n gagnant : {}".format(self.determiner_gagnant()))
+            self.determiner_gagnant()
+        if self.changer_joueur:
+            self.joueur_suivant()
+        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+            self.joueur_actif.ajouter_jeton(jeton)
+        self.update_board()
 
     def update_board(self):
         self.joueur_actif_update()
         self.score_board_update()
 
     def choix_passer_tour(self):
-        return
-        #TODO quoi faire lorsque tout passer
+        print("PASSER TOUR!")
+        self.changer_joueur = True
+        self.prochain_tour()
+
+
+    def choix_abandonner(self):
+        quitter = self.joueur_actif
+        self.joueur_suivant()
+        self.joueurs.remove(quitter)
+        self.changer_joueur = False
+        self.prochain_tour()
 
     def choix_changer_jeton(self):
+        self.changer_joueur = True
         return
         # TODO quoi faire lorsque change jeton
 
     def choix_placer_jeton(self):
+        self.changer_joueur = True
         return
         # TODO quoi faire lorsque change jeton
 
