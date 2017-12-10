@@ -168,7 +168,7 @@ class Scrabble(Tk):
         self.liste_label.grid(row=8, column=0, pady=2, padx=2)
         self.text_mot_place = StringVar()
         self.text_mot_place.set("")
-        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = N,fg="black", font=("Courier", 11))
+        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = S,fg="black", font=("Courier", 11))
         self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=10)
 
         # portion joueur
@@ -507,7 +507,7 @@ class Scrabble(Tk):
         """
         # TODO methode pour avoir un input du fichier
         try:
-            with open(nom_fichier, "wb") as f:
+            with open("zzzzz", "wb") as f:
                 pickle.dump(self, f)
         except:
             return False
@@ -521,7 +521,7 @@ class Scrabble(Tk):
         :return: Scrabble, l'objet chargé en mémoire.
         """
         # TODO methode pour avoir un input du fichier
-        with open(nom_fichier, "rb") as f:
+        with open("zzzzz", "rb") as f:
             objet = pickle.load(f)
         return objet
 
