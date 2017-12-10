@@ -48,8 +48,7 @@ class Scrabble(Tk):
         self.nb_pixels_per_case = 60
 
         # Bouton explication du jeu
-        self.voir_instruction = Button(self, text = "Lire instruction", command=self.lire_instruction,
-                                       width=20).grid(row=3, column=7, pady=2, padx=2)
+        self.voir_instruction = Button(self, text = "Lire instruction", command=self.lire_instruction, width=20).grid(row=3, column=7, pady=2, padx=2)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -67,6 +66,8 @@ class Scrabble(Tk):
         #fenetre de choix nouvelle partie
         self.new = Toplevel(self)
         self.new.wm_title('Nouvelle partie')
+        self.new.focus_set()
+        self.new.grab_set()
         w = 300  # width for the Tk
         h = 180  # height for the Tk main
         ws = self.winfo_screenwidth()  # width of the screen
@@ -90,13 +91,32 @@ class Scrabble(Tk):
     def lire_instruction(self):
         #fenetre de choix instruction
         self.new = Toplevel(self)
+        self.new.focus_set()
+        self.new.grab_set()
         self.new.wm_title("Instruction" )
-        Label(self.new, text ="Afin de jouer à cette version de Scrabble il faudra prendre les jetons sur le chevalet "
-                              "et les disposer \n sur le plateau de jeu puis cliquer sur terminer tour. Lorsque vous "
-                              "souhaitez changer vos jetons il faudra les prendre \n et les déposer dans le rectangle "
-                              "intitulé 'Changer jetons' puis cliquer sur terminer tour. \n Pour passer, cliquez sur "
-                              "terminer tour et pour abandonner cliquez sur abandonner. "
-                              "\n Bonne partie! ").grid(row = 0, column = 0)
+        txt = """
+        Bienvenue sur le jeu de Super Scrabble
+        
+        Afin de jouer à cette version de Scrabble il vous faudra déplacer les jetons à l'aide 
+        de votre souris puis appuyez sur le bouton terminer tour pour valider.
+        
+        Plusieurs options s'offre à vous:
+        
+        - Vous devez disposer les jetons sur le plateau pour placer un mot.
+        
+        - Pour changer vos jetons, il vous faudra les déposées dans le rectangle intitulé 'Changer jetons'.
+        
+        - Pour sauter votre tour, conserver les jetons sur votre chevalet
+
+
+
+
+                                                                                       Bonne partie!
+                                                                                        
+                                                                                       
+                                                                                        
+                                                                                        """
+        Label(self.new, text =txt).grid(row = 0, column = 0)
 
 
     def nouvelle_partie(self):
@@ -152,6 +172,7 @@ class Scrabble(Tk):
         # TODO test function sauvegarde
 
         # replace le layout pour debut parti
+        self.titre_top['text'] = "Mon Super Scrabble"
         self.titre_top.grid(row=0, column=2, columnspan=4, rowspan=1)
         self.plateau = Plateau(self, 30)
         self.plateau.grid(row=1, column=2, columnspan=4, rowspan=18)
@@ -176,7 +197,7 @@ class Scrabble(Tk):
         self.text_mot_place = StringVar()
         self.text_mot_place.set("")
         self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = S,fg="black", font=("Courier", 11))
-        self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=10)
+        self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=1)
 
         # portion joueur
         self.text_joueur_actif = StringVar()
@@ -187,16 +208,14 @@ class Scrabble(Tk):
         self.annonce_label.grid(row=21, column=2, columnspan=4, pady=2, padx=2)
         self.annonce.set('')
 
-        # self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
-        # self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22, column=3)
+        #portion bouton
         self.boutton_placer = Button(self, text="Terminer Tour", command=self.choix_terminer_tour)
         self.boutton_placer.grid(row=22, column=5)
         self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner)
         self.boutton_abandonner.grid(row=22, column=3)
         # signature
-        self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6)).grid(row=23, column=6,
-                                                                                                       pady=2, padx=2,
-                                                                                                       columnspan=2)
+        self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6))
+        self.score_label.grid(row=23, column=6, pady=2, padx=2, columnspan=2)
 
         # init langue
         if langue.upper() == 'FR':
@@ -264,7 +283,6 @@ class Scrabble(Tk):
 
     def choix_changer_jeton(self,swap_jeton):
         for pos in swap_jeton:
-            print(pos)
             self.jetons_libres.append( self.joueur_actif.retirer_jeton(int(pos)))  # retire jeton et lajoute a la liste des disponibles
         jeton_pigee = self.tirer_jetons(len(swap_jeton))
         for i in range(0, len(jeton_pigee)):
@@ -280,7 +298,7 @@ class Scrabble(Tk):
         pos_chev_changer = []
         offset = self.nb_pixels_per_case // 2  # pour pointer a partir du centre du jeton
         for jeton in self.plateau.jeton_chevalet:
-            if jeton.ypos < self.plateau.coords(self.plateau.chevalet)[1]:  # regarde ceux qui ne sont dans le plateau
+            if jeton.ypos < self.plateau.coords(self.plateau.chevalet)[1] - self.nb_pixels_per_case:  # regarde ceux qui ne sont dans le plateau
                 pos_chevalet.append(jeton.position)
                 pos_plateau.append((jeton.xpos + offset, jeton.ypos + offset))
             if jeton.ypos > self.plateau.coords(self.plateau.chevalet)[1] and jeton.xpos > \
@@ -357,9 +375,17 @@ class Scrabble(Tk):
             bool: True si la partie est terminée, et False autrement.
         """
         if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
-            self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
-            self.boutton_placer.grid_forget()
-            self.boutton_abandonner.grid_forget()
+            self.titre_top['text'] = "Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant())
+            # self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
+            #on vient effacer l<affichage
+            self.boutton_placer.destroy()
+            self.boutton_abandonner.destroy()
+            self.plateau.destroy()
+            self.liste_label.destroy()
+            self.mot_place.destroy()
+            self.joueur_actif_label.destroy()
+            self.annonce_label.destroy()
+
             return True
         return False
 
@@ -461,6 +487,7 @@ class Scrabble(Tk):
                 (s) pour sauvegarder ou (q) pour quitter"
             Notez que si le joueur fait juste sauvegarder on ne doit pas passer au joueur suivant mais dans tous les autres cas on doit passer au joueur suivant. S'il quitte la partie on l'enlève de la liste des joueurs.
         Une fois la partie terminée, on félicite le joueur gagnant!
+
         :return Ne retourne rien.
         """
         abandon = False

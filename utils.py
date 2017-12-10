@@ -32,6 +32,7 @@ class jeton_chev(object):
         self.canvas.tag_bind(self.texte, '<ButtonRelease-1>', self.release)
         self.move_flag = False
         self.position = number
+        self.size = size
         #debug
         self.nom = str(jeton)
 
@@ -41,10 +42,11 @@ class jeton_chev(object):
     def move(self, event):
         if self.move_flag:
             new_xpos, new_ypos = event.x, event.y
-            self.canvas.move(self.border, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
-            self.canvas.move(self.texte, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
-            self.mouse_xpos = new_xpos
-            self.mouse_ypos = new_ypos
+            if new_xpos > 5 and new_xpos < self.size//2 * 15 and new_ypos > 5 and new_ypos < self.size//2 * 18: #reste dans canvas
+                self.canvas.move(self.border, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
+                self.canvas.move(self.texte, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
+                self.mouse_xpos = new_xpos
+                self.mouse_ypos = new_ypos
         else:
             self.move_flag = True
             self.canvas.tag_raise(self.border)
