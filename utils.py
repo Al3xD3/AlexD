@@ -20,12 +20,12 @@ class jeton_chev(object):
         self.canvas = canvas.plateau
         poschevalet = self.canvas.coords(self.canvas.chevalet)
         offsetH = (size/2) // 2
-        debut_x = poschevalet[0] + (size/2) * (number * 2 + 1)
+        debut_x = poschevalet[0] + (size/2) * (number * 1.5 + 0.5)
         debut_y = poschevalet[1] + offsetH
         fin_x = debut_x + (size/2)
         fin_y = debut_y + (size/2)
         self.border = self.canvas.create_rectangle(debut_x, debut_y, fin_x, fin_y, fill='#b9936c', tags='lettreChevalet')
-        self.texte = self.canvas.create_text((debut_x + offsetH, debut_y + offsetH), font=('Times', '{}'.format(int((size/2) - 10))), text=str(jeton), tags='lettreChevalet')
+        self.texte = self.canvas.create_text((debut_x + offsetH, debut_y + offsetH), font=('Times', '{}'.format(int((size/2) - 14))), text=str(jeton), tags='lettreChevalet')
         self.xpos = debut_x
         self.ypos = debut_y
         self.canvas.tag_bind(self.texte, '<Button1-Motion>', self.move)

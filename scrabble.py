@@ -159,7 +159,7 @@ class Scrabble(Tk):
         self.text_joueur_actif = StringVar()
         self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black", font=("Courier", 12)).grid(row=20, column=3, columnspan=2, pady=2, padx=2)
         self.annonce = StringVar()
-        self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=3, columnspan=2, pady=2, padx=2)
+        self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=2, columnspan=4, pady=2, padx=2)
         self.annonce.set('')
 
         self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
@@ -226,7 +226,6 @@ class Scrabble(Tk):
         self.score_board_update()
 
     def choix_passer_tour(self):
-        print("PASSER TOUR!")
         self.changer_joueur = True
         self.prochain_tour()
 
@@ -251,15 +250,20 @@ class Scrabble(Tk):
                 pos_chevalet.append(jeton.position)
                 pos_plateau.append((jeton.xpos + offset,jeton.ypos + offset))
 
-        jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
-        mots, score = self.plateau.placer_mots(jetons, pos_plateau)
-        if any([not self.mot_permis(m) for m in mots]):
-            for pos in pos_plateau:
-                jeton = self.plateau.retirer_jeton(pos)
-                self.joueur_actif.ajouter_jeton(jeton)
-            self.annonce.set('Au moins un des mots est\nabsent du dictionnaire')
-            self.plateau.dessiner()
-            self.dessiner_chevalet()
+        # TEst positionnement
+        if self.plateau.valider_positions_avant_ajout(pos_plateau):
+            jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
+            mots, score = self.plateau.placer_mots(jetons, pos_plateau)
+            if any([not self.mot_permis(m) for m in mots]):
+                for pos in pos_plateau:
+                    jeton = self.plateau.retirer_jeton(pos)
+                    self.joueur_actif.ajouter_jeton(jeton)
+                self.annonce.set('Au moins un des mots est\nabsent du dictionnaire')
+                self.plateau.dessiner()
+                self.dessiner_chevalet()
+                return
+        else:
+            self.annonce.set('Au moins un des jetons est\nmal positione')
             return
         self.joueur_actif.ajouter_points(score)
         self.annonce.set('')
@@ -331,8 +335,6 @@ class Scrabble(Tk):
                 self.plateau.jeton_chevalet.append(jeton_chev(self,jeton, j, self.nb_pixels_per_case))
 
 
-        #TODO Implement un fall back si mot nn accepte
-
 
     def tirer_jetons(self, n):
         """
@@ -364,75 +366,7 @@ class Scrabble(Tk):
         # if self.chevalet.find_withtag(CURRENT):
         #     self.chevalet.itemconfig(CURRENT, fill="blue")
 
-#TODO DELETE unused tp3
-    def demander_positions(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
-        Demande à l'utilisateur d'entrer les positions sur le chevalet et le plateau
-        pour jouer son coup.
-        Si les positions entrées sont valides, on retourne les listes de ces positions. On doit
-        redemander tant que l'utilisateur ne donne pas des positions valides.
-        Valide ici veut dire uniquement dans les limites donc pensez à utilisez valider_positions_avant_ajout et Joueur.position_est_valide.
-        :return: tuple (int list, str list): Deux listes, la première contient les positions du chevalet (plus précisement il s'agit des indexes de ces positions) et l'autre liste contient les positions codées du plateau.
-        """
-        valide = False
-        while not valide:
-            pos_chevalet = []
-            for id in range(Joueur.TAILLE_CHEVALET):
-                if self.chevalet.itemcget(id, "fill") == "blue":
-                    pos_chevalet.append(id)
-            print(pos_chevalet)
-            #input_pos_chevalet = [int(x) for x in range(7) if self.chevalet[x]["fill"] == "blue"]
-            #pos_chevalet = [int(x) for x in input_pos_chevalet.split(' ')]
-            valide = all([Joueur.position_est_valide(pos) for pos in pos_chevalet])
 
-        valide = False
-        while not valide:
-            input_pos_plateau = input(
-                "Entrez les positions de chacune de ces lettres séparées par un espace: ").upper().strip()
-            pos_plateau = input_pos_plateau.split(' ')
-
-            if len(pos_chevalet) != len(pos_plateau):
-                print("Les nombres de jetons et de positions ne sont pas les mêmes.")
-                valide = False
-            else:
-                valide = self.plateau.valider_positions_avant_ajout(pos_plateau)
-
-        return pos_chevalet, pos_plateau
-
-    def jouer_un_tour(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
-        Faire jouer à un des joueurs son tour entier jusqu'à ce qu'il place un mot valide sur le
-        plateau.
-        Pour ce faire
-        1 - Afficher le plateau puis le joueur;
-        2 - Demander les positions à jouer;
-        3 - Retirer les jetons du chevalet;
-        4 - Valider si les positions sont valides pour un ajout sur le plateau;
-        5 - Si oui, placer les jetons sur le plateau, sinon retourner en 1;
-        6 - Si tous les mots formés sont dans le dictionnaire, alors ajouter les points au joueur actif;
-        7 - Sinon retirer les jetons du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
-        8 - Afficher le plateau.
-        :return: Ne retourne rien.
-        """
-        valide = False
-        while not valide:
-            pos_chevalet, pos_plateau = self.demander_positions()
-            jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
-
-            mots, score = self.plateau.placer_mots(jetons, pos_plateau)
-            if any([not self.mot_permis(m) for m in mots]):
-                print("Au moins l'un des mots formés est absent du dictionnaire.")
-                for pos in pos_plateau:
-                    jeton = self.plateau.retirer_jeton(pos)
-                    self.joueur_actif.ajouter_jeton(jeton)
-                valide = False
-            else:
-                print("Mots formés:", mots)
-                print("Score obtenu:", score)
-                self.joueur_actif.ajouter_points(score)
-                valide = True
-
-        print(self.plateau)
 
     def changer_jetons(self):
         """
@@ -461,6 +395,8 @@ class Scrabble(Tk):
             self.joueur_actif.ajouter_jeton(jeton_pigee[i])
         return
 
+
+#TODO DELETE func jouer
     def jouer(self):
         """
         Cette fonction permet de jouer la partie.

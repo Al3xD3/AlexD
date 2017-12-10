@@ -246,21 +246,21 @@ class Plateau(Canvas):
         self.bind('<Configure>', self.redimensionner)
         self.dessiner()
 
-    # cree pour TP4
-    def move_jeton(self,event):
-        print('move!')
-        print(event)
-        moving_jeton = self.find_withtag(CURRENT)
-        if self.move_flag:
-            new_xpos, new_ypos = event.x, event.y
-            self.move(moving_jeton, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
-            self.mouse_xpos = new_xpos
-            self.mouse_ypos = new_ypos
-        else:
-            self.move_flag = True
-            self.tag_raise(moving_jeton)
-            self.mouse_xpos = event.x
-            self.mouse_ypos = event.y
+    # cree pour TP4 #TODO DELETE now in class in util
+    # def move_jeton(self,event):
+    #     print('move!')
+    #     print(event)
+    #     moving_jeton = self.find_withtag(CURRENT)
+    #     if self.move_flag:
+    #         new_xpos, new_ypos = event.x, event.y
+    #         self.move(moving_jeton, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
+    #         self.mouse_xpos = new_xpos
+    #         self.mouse_ypos = new_ypos
+    #     else:
+    #         self.move_flag = True
+    #         self.tag_raise(moving_jeton)
+    #         self.mouse_xpos = event.x
+    #         self.mouse_ypos = event.y
 
     # revu pour TP4
     def dessiner(self):
@@ -286,10 +286,11 @@ class Plateau(Canvas):
                 if not self.cases[i][j].est_vide():
                     self.dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
         #Essaie d'integration chevalet dans canvas
-        self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*Plateau.DIMENSION,self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
+        self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION - 4 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
+        self.create_rectangle(self.nb_pixels_per_case*(Plateau.DIMENSION - 3 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
+        self.lac = self.create_text(self.nb_pixels_per_case*(Plateau.DIMENSION - 1.5 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 2), justify=CENTER, font=('Times', '{}'.format(self.nb_pixels_per_case//2)), text='Changer Jeton', tags='case',width=self.nb_pixels_per_case*3)
 
-
-# Outdated remplacer par classe Jeton_chev #TODO DElete
+    # Outdated remplacer par classe Jeton_chev #TODO DElete
     # def dessiner_jeton_chevalet(self, jeton, number):
     #     poschevalet = self.coords(self.chevalet)
     #     offsetH = self.nb_pixels_per_case // 2
@@ -347,7 +348,7 @@ class Plateau(Canvas):
         d = nb_pixels_per_case // 2
         debut_ligne, debut_colonne, fin_ligne, fin_colonne = self.coord_case(i, j, nb_pixels_per_case)
         self.create_rectangle(debut_colonne, debut_ligne, fin_colonne, fin_ligne, fill='#b9936c', tags=tag)
-        self.create_text((debut_colonne + d, debut_ligne + d), font=('Times', '{}'.format(int((nb_pixels_per_case / 2) - 10))), text=str(jeton), tags='lettre')
+        self.create_text((debut_colonne + d, debut_ligne + d), font=('Times', '{}'.format(int((nb_pixels_per_case / 2) - 2))), text=str(jeton), tags='lettre')
 
     def case_est_vide(self, position_code):
         """
@@ -427,7 +428,6 @@ class Plateau(Canvas):
         meme_ligne, meme_col = len(lignes) == 1, len(cols) == 1
         valide = meme_ligne or meme_col
         valide = valide and all([self.case_est_vide(p) for p in positions_codes])
-        print(valide)
         if valide:
             if self.est_vide():
                 valide = (7, 7) in positions_decodees
@@ -454,8 +454,6 @@ class Plateau(Canvas):
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        assert self.valider_positions_avant_ajout(position_codes), "Les positions pour l'ajout sont invalides."
-
         for jeton, pos in zip(jetons_a_ajouter, position_codes):
             self.ajouter_jeton(jeton, pos)
 
