@@ -160,6 +160,7 @@ class Scrabble(Tk):
         self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black", font=("Courier", 12)).grid(row=20, column=3, columnspan=2, pady=2, padx=2)
         self.annonce = StringVar()
         self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=3, columnspan=2, pady=2, padx=2)
+        self.annonce.set('')
 
         self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
         self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22,
@@ -250,25 +251,18 @@ class Scrabble(Tk):
                 pos_chevalet.append(jeton.position)
                 pos_plateau.append((jeton.xpos + offset,jeton.ypos + offset))
 
-        valide = False
-        while not valide:
-            jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
-            mots, score = self.plateau.placer_mots(jetons, pos_plateau)
-            if any([not self.mot_permis(m) for m in mots]):
-                for pos in pos_plateau:
-                    jeton = self.plateau.retirer_jeton(pos)
-                    self.joueur_actif.ajouter_jeton(jeton)
-                    self.annonce.set('Au moins un des mots est absent du dictionnaire')
-                    self.plateau.dessiner()
-                    self.dessiner_chevalet()
-                    #TODO replacer L,ensemble des jeton dans le chevalet, pas juste le dernier
-                    return
-                valide = False
-            else:
-                print("Mots formés:", mots)
-                print("Score obtenu:", score)
-                self.joueur_actif.ajouter_points(score)
-                valide = True
+        jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
+        mots, score = self.plateau.placer_mots(jetons, pos_plateau)
+        if any([not self.mot_permis(m) for m in mots]):
+            for pos in pos_plateau:
+                jeton = self.plateau.retirer_jeton(pos)
+                self.joueur_actif.ajouter_jeton(jeton)
+            self.annonce.set('Au moins un des mots est\nabsent du dictionnaire')
+            self.plateau.dessiner()
+            self.dessiner_chevalet()
+            return
+        self.joueur_actif.ajouter_points(score)
+        self.annonce.set('')
         self.changer_joueur = True
         self.prochain_tour()
 
