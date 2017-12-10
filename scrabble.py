@@ -222,9 +222,10 @@ class Scrabble(Tk):
         #efface jeton du jouer d,avant
         self.plateau.dessiner()
         # Verif si fin de parti
-        if self.partie_terminee():
-            print("partie terminer... TODO implement display \n gagnant : {}".format(self.determiner_gagnant()))
-            self.determiner_gagnant()
+        self.partie_terminee()
+        # if self.partie_terminee():
+        #     self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
+        #     self.determiner_gagnant()
         if self.changer_joueur:
             self.joueur_suivant()
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
@@ -341,6 +342,8 @@ class Scrabble(Tk):
             bool: True si la partie est terminée, et False autrement.
         """
         if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
+            self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
+#TODO Disable bouton du bas
             return True
         return False
 
