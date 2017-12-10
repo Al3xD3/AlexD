@@ -4,7 +4,8 @@ from Joueur import Joueur
 from plateau import Plateau, Jeton
 from tkinter import *
 from tkinter import messagebox
-from utils import dessiner_jeton
+from utils import jeton_chev
+
 
 class Scrabble(Tk):
     """
@@ -62,14 +63,9 @@ class Scrabble(Tk):
         #self.chevalet.grid(sticky=S)
 
     def nouveau_pop(self):
+        #fenetre de choix nouvelle partie
         self.new = Toplevel(self)
         self.new.wm_title('Nouvelle partie')
-        # self.plateau = Plateau(self, self.nb_pixels_per_case)
-        # self.plateau.grid(row=0, column=0, sticky=NSEW)
-
-        # self.chevalet = Canvas(self, height=self.nb_pixels_per_case,
-        #                               width=7*self.nb_pixels_per_case, bg='#645b4b')
-        # self.chevalet.grid(sticky=SW)
         w = 300  # width for the Tk
         h = 180  # height for the Tk main
         ws = self.winfo_screenwidth()  # width of the screen
@@ -88,7 +84,10 @@ class Scrabble(Tk):
             Radiobutton(self.new, text=str(i) + " joueurs", padx=20, variable=self.nbre_joueur, value=i).grid(row=i - 1,
                                                                                                               column=1)
         Button(self.new, text="Commencer", command=self.nouvelle_partie).grid(column=0, columnspan=2, pady=10)
+
+
     def lire_instruction(self):
+        #fenetre de choix instruction
         self.new = Toplevel(self)
         self.new.wm_title("Instruction", )
 
@@ -117,8 +116,8 @@ class Scrabble(Tk):
 
     def joueur_actif_update(self):
         txt = "Au tour de: {}".format(self.joueur_actif.nom)
-        txt += "\n{}".format(self.joueur_actif)
         self.text_joueur_actif.set(txt)
+
 
     def initialiser_jeu(self, nb_joueurs, langue='fr'):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -136,10 +135,7 @@ class Scrabble(Tk):
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
         # Bouton Sauvegarder
-        self.start_new = Button(self, text="Sauvegarder Partie", command=self.sauvegarder_partie, width=30).grid(row=2,
-                                                                                                                 column=7,
-                                                                                                                 pady=2,
-                                                                                                                 padx=2)
+        self.start_new = Button(self, text="Sauvegarder Partie", command=self.sauvegarder_partie, width=30).grid(row=2,column=7,pady=2,padx=2)
         # TODO test function sauvegarde
 
         # replace le layout pour debut parti
@@ -155,26 +151,20 @@ class Scrabble(Tk):
         self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
 
         # init score board
-        self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12)).grid(row=1,
-                                                                                                            column=0,
-                                                                                                            pady=2,
-                                                                                                            padx=2)
+        self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12)).grid(row=1, column=0, pady=2, padx=2)
         self.text_score_joueur = StringVar()
-        self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11)).grid(
-            row=2, column=0, pady=2, padx=2, rowspan=4)
+        self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11)).grid( row=2, column=0, pady=2, padx=2, rowspan=4)
 
         # portion joueur
         self.text_joueur_actif = StringVar()
-        self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black",
-                                        font=("Courier", 12)).grid(row=20, column=3, columnspan=2, pady=2, padx=2)
-        self.chevalet.grid(row=21, column =2, columnspan = 4)
-        #Label(self, text="PlaceHolder Chevalet", fg="black", font=("Courier", 16)).grid(row=21, column=2, columnspan=4,
-                                                                                        #pady=2, padx=2)
+        self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black", font=("Courier", 12)).grid(row=20, column=3, columnspan=2, pady=2, padx=2)
+        self.annonce = StringVar()
+        self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=3, columnspan=2, pady=2, padx=2)
 
         self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
         self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22,
                                                                                                          column=3)
-        self.boutton_placer = Button(self, text="Placer Jeton", command=self.jouer_un_tour).grid(row=22, column=5)
+        self.boutton_placer = Button(self, text="Placer Jeton", command=self.choix_placer_jeton).grid(row=22, column=5)
         self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner).grid(row=22, column=4)
 
         # signature
@@ -218,6 +208,8 @@ class Scrabble(Tk):
         self.update_board()
 
     def prochain_tour(self):
+        #efface jeton du jouer d,avant
+        self.plateau.dessiner()
         # Verif si fin de parti
         if self.partie_terminee():
             print("partie terminer... TODO implement display \n gagnant : {}".format(self.determiner_gagnant()))
@@ -250,9 +242,36 @@ class Scrabble(Tk):
         # TODO quoi faire lorsque change jeton
 
     def choix_placer_jeton(self):
+        pos_chevalet = []
+        pos_plateau = []
+        offset = self.nb_pixels_per_case //2 #pour pointer a partir du centre du jeton
+        for jeton in self.plateau.jeton_chevalet:
+            if jeton.ypos < self.plateau.coords(self.plateau.chevalet)[1]:   #regarde ceux qui ne sont plus dans le chevalet
+                pos_chevalet.append(jeton.position)
+                pos_plateau.append((jeton.xpos + offset,jeton.ypos + offset))
+
+        valide = False
+        while not valide:
+            jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
+            mots, score = self.plateau.placer_mots(jetons, pos_plateau)
+            if any([not self.mot_permis(m) for m in mots]):
+                for pos in pos_plateau:
+                    jeton = self.plateau.retirer_jeton(pos)
+                    self.joueur_actif.ajouter_jeton(jeton)
+                    self.annonce.set('Au moins un des mots est absent du dictionnaire')
+                    self.plateau.dessiner()
+                    self.dessiner_chevalet()
+                    #TODO replacer L,ensemble des jeton dans le chevalet, pas juste le dernier
+                    return
+                valide = False
+            else:
+                print("Mots formés:", mots)
+                print("Score obtenu:", score)
+                self.joueur_actif.ajouter_points(score)
+                valide = True
         self.changer_joueur = True
-        return
-        # TODO quoi faire lorsque change jeton
+        self.prochain_tour()
+
 
     def mot_permis(self, mot):
         """
@@ -311,10 +330,15 @@ class Scrabble(Tk):
         self.dessiner_chevalet()
 
     def dessiner_chevalet(self):
-        self.chevalet.delete('lettre')
+        self.plateau.delete('lettreChevalet')
+        self.plateau.jeton_chevalet = []
         for j, jeton in enumerate(self.joueur_actif.jetons):
             if jeton:
-                dessiner_jeton(self.chevalet, jeton, 0, j, self.nb_pixels_per_case)
+                self.plateau.jeton_chevalet.append(jeton_chev(self,jeton, j, self.nb_pixels_per_case))
+
+
+        #TODO Implement un fall back si mot nn accepte
+
 
     def tirer_jetons(self, n):
         """
@@ -337,10 +361,16 @@ class Scrabble(Tk):
         return pige
 
     def highlight_case_chevalet(self, event):
-        if self.chevalet.find_withtag(CURRENT):
-            self.chevalet.itemconfig(CURRENT, fill="blue")
+        global drag_id, dragged
+        items = self.chevalet.find_withtag(CURRENT)
+        if items:
+            image = self.itemcget(items[0], 'image')
+            dragged = DragToplevel(self, image, event.x_root, event.y_root)
+            drag_id = self.bind('<Motion>', lambda e: dragged.move(e.x_root, e.y_root))
+        # if self.chevalet.find_withtag(CURRENT):
+        #     self.chevalet.itemconfig(CURRENT, fill="blue")
 
-
+#TODO DELETE unused tp3
     def demander_positions(self):
         """ *** Vous n'avez pas à coder cette méthode ***
         Demande à l'utilisateur d'entrer les positions sur le chevalet et le plateau
@@ -390,8 +420,6 @@ class Scrabble(Tk):
         8 - Afficher le plateau.
         :return: Ne retourne rien.
         """
-        print(self.plateau)
-        print(self.joueur_actif)
         valide = False
         while not valide:
             pos_chevalet, pos_plateau = self.demander_positions()

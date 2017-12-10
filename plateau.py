@@ -1,5 +1,5 @@
 from tkinter import *
-from utils import coord_case, dessiner_jeton
+
 
 class Jeton:
     """
@@ -213,7 +213,7 @@ class Plateau(Canvas):
     DIMENSION = 15
 
 
-
+    # revu pour TP4
     def __init__(self, parent, nb_pixels_per_case):
         """ *** Vous n'avez pas à coder cette méthode ***
         Constructeur d'un plateau.
@@ -221,8 +221,8 @@ class Plateau(Canvas):
         Vous pouvez commencer par créer l'attribut cases en considérant qu'aucune case n'est spéciale.
         Regardez ensuite sur un vrai plateau de scrabble quelles positions sont spéciales, créer ces cases spéciales et remplacez les anciennes cases.
         """
-        super().__init__(parent, width=nb_pixels_per_case*Plateau.DIMENSION,
-                         height=nb_pixels_per_case*Plateau.DIMENSION)
+        super().__init__(parent, width=nb_pixels_per_case*Plateau.DIMENSION + 4,
+                         height=nb_pixels_per_case*(Plateau.DIMENSION + 3) + 4)
         self.parent = parent
         self.nb_pixels_per_case = nb_pixels_per_case
 
@@ -243,22 +243,33 @@ class Plateau(Canvas):
             self.cases[7 - i][7 + j] = Case(2, 'L')
             self.cases[7 + i][7 + j] = Case(2, 'L')
         self.cases[7][7] = Case(2, 'M')
-
-
-        self.tag_bind("case", "<Button-1>", self.highlight_case_plateau)  # non fonctionnel à revoir
         self.bind('<Configure>', self.redimensionner)
         self.dessiner()
 
+    # cree pour TP4
+    def move_jeton(self,event):
+        print('move!')
+        print(event)
+        moving_jeton = self.find_withtag(CURRENT)
+        if self.move_flag:
+            new_xpos, new_ypos = event.x, event.y
+            self.move(moving_jeton, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
+            self.mouse_xpos = new_xpos
+            self.mouse_ypos = new_ypos
+        else:
+            self.move_flag = True
+            self.tag_raise(moving_jeton)
+            self.mouse_xpos = event.x
+            self.mouse_ypos = event.y
 
-
+    # revu pour TP4
     def dessiner(self):
         self.delete('case')
         self.delete('lettre')
-
-
+        # self.delete('lettreChevalet')
         for i in range(Plateau.DIMENSION):
             for j in range(Plateau.DIMENSION):
-                debut_ligne, debut_colonne, fin_ligne, fin_colonne = coord_case(i, j, self.nb_pixels_per_case)
+                debut_ligne, debut_colonne, fin_ligne, fin_colonne = self.coord_case(i, j, self.nb_pixels_per_case)
 
                 # On dessine le rectangle. On utilise l'attribut "tags" pour être en mesure de récupérer les éléments
                 # par la suite.
@@ -267,54 +278,76 @@ class Plateau(Canvas):
 
                 delta = int(self.nb_pixels_per_case/2.)
                 if i == j and i == 7:
-                    self.create_text((debut_colonne + delta, debut_ligne + delta), justify=CENTER,
-                                     font=('Times', '{}'.format(delta)), text='\u2605', tags='case')
+                    self.create_text((debut_colonne + delta, debut_ligne + delta), justify=CENTER, font=('Times', '{}'.format(delta)), text='\u2605', tags='case')
                 else:
                     self.create_text((debut_colonne + delta, debut_ligne + delta),
                                      font=('Times', '{}'.format(int(delta/2))),
                                      justify=CENTER, text=self.cases[i][j].text_case, tags='case')
                 if not self.cases[i][j].est_vide():
-                    dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
+                    self.dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
+        #Essaie d'integration chevalet dans canvas
+        self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*Plateau.DIMENSION,self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
 
+
+# Outdated remplacer par classe Jeton_chev #TODO DElete
+    # def dessiner_jeton_chevalet(self, jeton, number):
+    #     poschevalet = self.coords(self.chevalet)
+    #     offsetH = self.nb_pixels_per_case // 2
+    #     debut_x = poschevalet[0] + self.nb_pixels_per_case * ( number*2 + 1)
+    #     debut_y = poschevalet[1] + offsetH
+    #     fin_x = debut_x + self.nb_pixels_per_case
+    #     fin_y = debut_y + self.nb_pixels_per_case
+    #     self.create_rectangle(debut_x, debut_y, fin_x, fin_y, fill='#b9936c', tags='lettreChevalet{}'.format(number))
+    #     self.create_text((debut_x + offsetH, debut_y + offsetH), font=('Times', '{}'.format(self.nb_pixels_per_case - 7)), text=str(jeton), tags='lettreChevalet{}'.format(number))
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)
         self.nb_pixels_per_case = new_dim // Plateau.DIMENSION
         self.delete('case')
         self.delete('lettre')
+        # self.delete('lettreChevalet')
         self.dessiner()
 
-    @staticmethod
-    def code_position_est_valide(code):
+    # revu pour TP4
+    def code_position_est_valide(self, code):
         """ *** Vous n'avez pas à coder cette méthode ***
         Méthode statique permettant de valider si un code de positionnement sur le tableau est valide ou pas.
-        :param code: str au format « XY » ou « xy » représentant un code de positionnement.
-        :return: True si le code passé en argument est un code de positionnement au format « XY » ou « xy » valide. En gros, c'est insensible à la casse.
+        :param code: liste contenant int [x,y] représentant un code de positionnement.
+        :return: True si le code passé en argument est un code de positionnement valide
         """
-        code = code.upper()
-        valide = 2 <= len(code) <= 3 and code[0].isalpha() and code[1:].isdigit()
-        if valide:
-            index_ligne = ord(code[0]) - ord('A')
-            index_colonne = int(code[1:]) - 1
-            return 0 <= index_ligne < Plateau.DIMENSION and 0 <= index_colonne < Plateau.DIMENSION
-        return False
+        if 0 < code[0] < (self.nb_pixels_per_case*(self.DIMENSION + 1)):
+            if 0 < code[0] < (self.nb_pixels_per_case * (self.DIMENSION + 1)):
+                return True
+            return False
 
-    @staticmethod
-    def decode_position(code):
+    # revu pour TP4
+    def decode_position(self,code):
         """
         Méthode statique servant à transformer un code de positionnement sur le plateau
         en index d'accès de ligne et de colonne sur le plateau.
 
-        :param s: str au format « XY » ou « xy » représentant un code de positionnement.
+        :param s: liste contenant int [x,y] représentant un code de positionnement.
 
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        assert Plateau.code_position_est_valide(code), "Code position invalide."
-        code = code.upper()
-        index_ligne = ord(code[0]) - ord('A')
-        index_colonne = int(code[1:]) - 1
-        return index_ligne, index_colonne
+        assert self.code_position_est_valide(code), "Code position invalide."
+        index_ligne = code[1]//self.nb_pixels_per_case - 1
+        index_colonne = code[0]//self.nb_pixels_per_case - 1
+        return (index_ligne, index_colonne)
+
+    def coord_case(self, i, j, nb_pixels_per_case):
+        debut_ligne = i * nb_pixels_per_case + 2
+        fin_ligne = debut_ligne + nb_pixels_per_case + 2
+        debut_colonne = j * nb_pixels_per_case + 2
+        fin_colonne = debut_colonne + nb_pixels_per_case + 2
+        return debut_ligne, debut_colonne, fin_ligne, fin_colonne
+
+    def dessiner_jeton(self, jeton, i, j, nb_pixels_per_case, tag='lettre'):
+        d = nb_pixels_per_case // 2
+        debut_ligne, debut_colonne, fin_ligne, fin_colonne = self.coord_case(i, j, nb_pixels_per_case)
+        self.create_rectangle(debut_colonne, debut_ligne, fin_colonne, fin_ligne, fill='#b9936c', tags=tag)
+        self.create_text((debut_colonne + d, debut_ligne + d), font=('Times', '{}'.format(int((nb_pixels_per_case / 2) - 10))), text=str(jeton), tags='lettre')
 
     def case_est_vide(self, position_code):
         """
@@ -323,7 +356,7 @@ class Plateau(Canvas):
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        index_ligne, index_colonne = self.decode_position(position_code)
         return self.cases[index_ligne][index_colonne].est_vide()
 
     def est_vide(self):
@@ -341,7 +374,7 @@ class Plateau(Canvas):
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        index_ligne, index_colonne = self.decode_position(position_code)
         assert self.case_est_vide(position_code), 'Position occupée.'
         self.cases[index_ligne][index_colonne].placer_jeton(jeton)
 
@@ -352,7 +385,7 @@ class Plateau(Canvas):
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        index_ligne, index_colonne = self.decode_position(position_code)
         assert not self.case_est_vide(position_code), 'Position occupée.'
         jeton = self.cases[index_ligne][index_colonne].retirer_jeton()
         return jeton
@@ -366,7 +399,7 @@ class Plateau(Canvas):
         :return: True si au moins l'une des cases voisines est occupée, False si aucune case voisine n'est occupée.
         :exception: Levez une exception avec assert si le code de la position est invalide
         """
-        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        index_ligne, index_colonne = self.decode_position(position_code)
         voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne), (index_ligne - 1, index_colonne)]
         voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION)
                    and (0 <= j < Plateau.DIMENSION)]
@@ -388,12 +421,13 @@ class Plateau(Canvas):
         :return: True si les positions sont valides, False sinon.
         :exception: Levez une exception avec assert si le code d'une des positions est invalide.
         """
-        positions_decodees = [Plateau.decode_position(p) for p in positions_codes]
+        positions_decodees = [self.decode_position(p) for p in positions_codes]
         lignes, cols = zip(*positions_decodees)
         lignes, cols = list(set(lignes)), list(set(cols))
         meme_ligne, meme_col = len(lignes) == 1, len(cols) == 1
         valide = meme_ligne or meme_col
         valide = valide and all([self.case_est_vide(p) for p in positions_codes])
+        print(valide)
         if valide:
             if self.est_vide():
                 valide = (7, 7) in positions_decodees
@@ -406,12 +440,8 @@ class Plateau(Canvas):
             elif valide and meme_col:
                 col, n, m = cols[0], min(lignes), max(lignes)
                 valide = all([(not self.cases[i][col].est_vide()) for i in range(n, m + 1) if i not in lignes])
-
         return valide
 
-    def highlight_case_plateau(self, event):
-        if self.find_withtag(CURRENT):
-            self.itemconfig(CURRENT, fill="blue")
 
     def placer_mots(self, jetons_a_ajouter, position_codes):
         """
@@ -438,7 +468,7 @@ class Plateau(Canvas):
         :param nouvelles_positions: str list, liste de chaînes de caractères représentant les dernières positions où des jetons ont été ajoutés.
         :return: L'ensemble des mots formés par l'ajout de jetons aux nouvelles positions.
         """
-        positions_decodees = [Plateau.decode_position(p) for p in nouvelles_positions]
+        positions_decodees = [self.decode_position(p) for p in nouvelles_positions]
         score_total = 0
         lignes, cols = zip(*positions_decodees)
         mots = []
