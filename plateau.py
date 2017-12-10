@@ -287,7 +287,7 @@ class Plateau(Canvas):
                     self.dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
         #Essaie d'integration chevalet dans canvas
         self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION - 4 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
-        self.create_rectangle(self.nb_pixels_per_case*(Plateau.DIMENSION - 3 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
+        self.rectanlge_lac = self.create_rectangle(self.nb_pixels_per_case*(Plateau.DIMENSION - 3 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
         self.lac = self.create_text(self.nb_pixels_per_case*(Plateau.DIMENSION - 1.5 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 2), justify=CENTER, font=('Times', '{}'.format(self.nb_pixels_per_case//2)), text='Changer Jeton', tags='case',width=self.nb_pixels_per_case*3)
 
     # Outdated remplacer par classe Jeton_chev #TODO DElete

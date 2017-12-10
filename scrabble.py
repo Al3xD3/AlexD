@@ -162,11 +162,10 @@ class Scrabble(Tk):
         self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=2, columnspan=4, pady=2, padx=2)
         self.annonce.set('')
 
-        self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
-        self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22,
-                                                                                                         column=3)
-        self.boutton_placer = Button(self, text="Placer Jeton", command=self.choix_placer_jeton).grid(row=22, column=5)
-        self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner).grid(row=22, column=4)
+        # self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
+        # self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22, column=3)
+        self.boutton_placer = Button(self, text="Terminer Tour", command=self.choix_terminer_tour).grid(row=22, column=5)
+        self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner).grid(row=22, column=3)
 
         # signature
         self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6)).grid(row=23, column=6,
@@ -236,21 +235,42 @@ class Scrabble(Tk):
         self.changer_joueur = False
         self.prochain_tour()
 
-    def choix_changer_jeton(self):
+    def choix_changer_jeton(self,swap_jeton):
+        for pos in swap_jeton:
+            self.jetons_libres.append( self.joueur_actif.retirer_jeton(int(pos) - 1))  # retire jeton et lajoute a la liste des disponibles
+        jeton_pigee = self.tirer_jetons(len(swap_jeton))
+        for i in range(0, len(jeton_pigee)):
+            self.joueur_actif.ajouter_jeton(jeton_pigee[i])
         self.changer_joueur = True
-        return
-        # TODO quoi faire lorsque change jeton
+        self.prochain_tour()
 
-    def choix_placer_jeton(self):
+
+    def choix_terminer_tour(self):
+        #fonction qui deide quel type de tour a ete jouer
         pos_chevalet = []
         pos_plateau = []
-        offset = self.nb_pixels_per_case //2 #pour pointer a partir du centre du jeton
+        pos_chev_changer = []
+        offset = self.nb_pixels_per_case // 2  # pour pointer a partir du centre du jeton
         for jeton in self.plateau.jeton_chevalet:
-            if jeton.ypos < self.plateau.coords(self.plateau.chevalet)[1]:   #regarde ceux qui ne sont plus dans le chevalet
+            if jeton.ypos < self.plateau.coords(self.plateau.chevalet)[1]:  # regarde ceux qui ne sont dans le plateau
                 pos_chevalet.append(jeton.position)
-                pos_plateau.append((jeton.xpos + offset,jeton.ypos + offset))
+                pos_plateau.append((jeton.xpos + offset, jeton.ypos + offset))
+            if jeton.ypos > self.plateau.coords(self.plateau.chevalet)[1] and jeton.xpos > \
+                    self.plateau.coords(self.plateau.rectanlge_lac)[0]:  # regarde ceux qui sont dans le changer
+                pos_chev_changer.append(jeton.position)
+        if len(pos_chevalet) > 0 and len(pos_chev_changer) > 0:
+            self.annonce.set('Vous avez des jetons sur le plateau et\nen position dechangement de jeton, une seul de\nses actions peut etre effectue a la fois.')
+            self.plateau.dessiner()
+            self.dessiner_chevalet()
+        elif len(pos_chevalet) > 0 and len(pos_chev_changer) == 0:
+            self.choix_placer_jeton(pos_chevalet,pos_plateau)
+        elif len(pos_chevalet) == 0 and len(pos_chev_changer) > 0:
+            self.choix_changer_jeton(pos_chev_changer)
+        elif len(pos_chevalet) == 0 and len(pos_chev_changer) == 0:
+            self.choix_passer_tour()
 
-        # TEst positionnement
+    def choix_placer_jeton(self,pos_chevalet,pos_plateau):
+        # prend liste index chevalet et pos plateau
         if self.plateau.valider_positions_avant_ajout(pos_plateau):
             jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
             mots, score = self.plateau.placer_mots(jetons, pos_plateau)
