@@ -100,7 +100,7 @@ class Scrabble(Tk):
         :return str langue FR ou EN
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-
+        #TODO effacer ancienne valeur
         self.initialiser_jeu(self.nbre_joueur.get(), self.langue_possible[self.langue.get()][1])
         self.new.destroy()
         # TODO Que doit ton reseter?
@@ -140,7 +140,8 @@ class Scrabble(Tk):
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
         # Bouton Sauvegarder
-        self.start_new = Button(self, text="Sauvegarder Partie", command=self.sauvegarder_partie, width=30).grid(row=2,column=7,pady=2,padx=2)
+        self.start_new = Button(self, text="Sauvegarder Partie", command=self.sauvegarder_partie, width=30)
+        self.start_new.grid(row=2,column=7,pady=2,padx=2)
         # TODO test function sauvegarde
 
         # replace le layout pour debut parti
@@ -156,28 +157,35 @@ class Scrabble(Tk):
         self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
 
         # init score board
-        self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12)).grid(row=1, column=0, pady=2, padx=2)
+        self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12))
+        self.score_label.grid(row=1, column=0, pady=2, padx=2)
         self.text_score_joueur = StringVar()
-        self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11)).grid( row=2, column=0, pady=2, padx=2, rowspan=4)
+        self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11))
+        self.score_joueur.grid( row=2, column=0, pady=2, padx=2, rowspan=4)
 
         #Init Liste mot joue
-        self.liste_label = Label(self, text="Mots Placées", fg="black", font=("Courier", 12)).grid(row=8, column=0, pady=2, padx=2)
+        self.liste_label = Label(self, text="Mots Placées", fg="black", font=("Courier", 12))
+        self.liste_label.grid(row=8, column=0, pady=2, padx=2)
         self.text_mot_place = StringVar()
         self.text_mot_place.set("")
-        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = N,fg="black", font=("Courier", 11)).grid( row=9, column=0, pady=2, padx=2, rowspan=10)
+        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = N,fg="black", font=("Courier", 11))
+        self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=10)
 
         # portion joueur
         self.text_joueur_actif = StringVar()
-        self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black", font=("Courier", 12)).grid(row=20, column=3, columnspan=2, pady=2, padx=2)
+        self.joueur_actif_label = Label(self, textvariable=self.text_joueur_actif, fg="black", font=("Courier", 12))
+        self.joueur_actif_label.grid(row=20, column=3, columnspan=2, pady=2, padx=2)
         self.annonce = StringVar()
-        self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12)).grid(row=21, column=2, columnspan=4, pady=2, padx=2)
+        self.annonce_label = Label(self, textvariable=self.annonce, fg="black", font=("Courier", 12))
+        self.annonce_label.grid(row=21, column=2, columnspan=4, pady=2, padx=2)
         self.annonce.set('')
 
         # self.boutton_pass = Button(self, text="Passer", command=self.choix_passer_tour).grid(row=22, column=2)
         # self.boutton_changer = Button(self, text="Changer Jeton", command=self.choix_changer_jeton).grid(row=22, column=3)
-        self.boutton_placer = Button(self, text="Terminer Tour", command=self.choix_terminer_tour).grid(row=22, column=5)
-        self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner).grid(row=22, column=3)
-
+        self.boutton_placer = Button(self, text="Terminer Tour", command=self.choix_terminer_tour)
+        self.boutton_placer.grid(row=22, column=5)
+        self.boutton_abandonner = Button(self, text="Abandonner", command=self.choix_abandonner)
+        self.boutton_abandonner.grid(row=22, column=3)
         # signature
         self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6)).grid(row=23, column=6,
                                                                                                        pady=2, padx=2,
@@ -343,7 +351,8 @@ class Scrabble(Tk):
         """
         if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
             self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
-#TODO Disable bouton du bas
+            self.boutton_placer.grid_forget()
+            self.boutton_abandonner.grid_forget()
             return True
         return False
 
