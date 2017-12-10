@@ -1,4 +1,5 @@
-from tkinter import Canvas, CENTER
+from tkinter import *
+from utils import coord_case, dessiner_jeton
 
 class Jeton:
     """
@@ -16,8 +17,9 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        assert lettre == lettre.upper(), "La lettre n'est pas en majuscule."
-        assert 0 <= valeur <= 20, "La valeur doit se situer entre 0 et 20 inclusivement."
+        assert len(lettre) == 1 and lettre.isupper() and lettre.isalpha(), "Lettre incorrecte."
+        assert 0 <= valeur <= 20, "Valeur incorrecte."
+
         self.lettre = lettre
         self.valeur = valeur
 
@@ -57,8 +59,8 @@ class Case:
         :exception: Levez une exception avec assert si le multiplicateur ne respecte pas
         la condition suivante 1 <= multiplicateur <= 3 ou si le type n'est ni None, ni 'M', ni 'L'.
         """
-        assert 1 <= multiplicateur <= 3 , "Le multiplicateur doit se situer entre 1 et 3 inclusivement."
-        assert type in (None, 'M', 'L'), "Le Type n'est ni None, ni 'M', ni 'L'."
+        assert 1 <= multiplicateur <= 3, "Multiplicateur incorrect."
+        assert type is None or type in "ML", "Type incorrect."
         self.multiplicateur = multiplicateur
         self.type = type
         self.jeton_occupant = None
@@ -68,9 +70,7 @@ class Case:
         Vérifie si une case est vide ou pas (jeton_occupant est None ou pas).
         :return: True si la case est vide, False sinon.
         """
-        if self.jeton_occupant == None:
-            return True   #case vide
-        return False   #case non-vide
+        return self.jeton_occupant is None
 
     def placer_jeton(self, jeton):
         """
@@ -79,9 +79,8 @@ class Case:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la case est déjà occupée.
         """
-        assert self.est_vide(), "La case est déjà occupée, on ne peut pas placer un nouveau jeton"
+        assert self.est_vide(), "Case non vide."
         self.jeton_occupant = jeton
-        return
 
     def retirer_jeton(self):
         """
@@ -89,10 +88,10 @@ class Case:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert self.est_vide() == False, "La case est déjà vide, on ne peut pas retirer un jeton"
-        jeton_retirer = self.jeton_occupant #va chercher le jeton contenu par la case
-        self.jeton_occupant = None #remet la case vide
-        return jeton_retirer  #retourne le jeton
+        assert not self.est_vide(), "Case vide."
+        jeton = self.jeton_occupant
+        self.jeton_occupant = None
+        return jeton
 
     def valeur_jeton(self):
         """
@@ -100,8 +99,8 @@ class Case:
         :return: int, valeur du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert self.est_vide() == False, "La case est vide, impossible de trouver la valeur du jeton"
-        return self.jeton_occupant.valeur #retourne la valeur du jeton présent sur la case
+        assert not self.est_vide(), "Aucun jeton dans la case."
+        return self.jeton_occupant.valeur
 
     def lettre_jeton(self):
         """
@@ -109,12 +108,12 @@ class Case:
         :return: str, lettre du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert self.est_vide() == False, "La case est vide, impossible de trouver la lettre du jeton"
-        return self.jeton_occupant.lettre #retourne la valeur du jeton présent sur la case
-    
+        assert not self.est_vide(), "Aucun jeton dans la case."
+        return self.jeton_occupant.lettre
+
     @property
     def code_couleur(self):
-        """  *** Vous n'avez pas à coder cette méthode ***   tire du labo11
+        """  *** Vous n'avez pas à coder cette méthode ***
         Méthode permettant de trouver la couleur associée à une case.
         :return: int, code de couleur de la case.
         """
@@ -132,8 +131,8 @@ class Case:
     @property
     def text_case(self):
         """  *** Vous n'avez pas à coder cette méthode ***
-        Méthode permettant de trouver la couleur associée à une case.
-        :return: int, code de couleur de la case.
+        Méthode permettant de trouver le texte associé à une case.
+        :return: int, texte de la case.
         """
         if self.type == "M" and self.multiplicateur == 2:
             return "Mot\nDouble"
@@ -153,7 +152,6 @@ class Case:
         """
         s = "" if self.est_vide() else str(self.jeton_occupant)
         return "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.code_couleur, s)
-
 
 class Plateau(Canvas):
     """
@@ -214,6 +212,8 @@ class Plateau(Canvas):
     """
     DIMENSION = 15
 
+
+
     def __init__(self, parent, nb_pixels_per_case):
         """ *** Vous n'avez pas à coder cette méthode ***
         Constructeur d'un plateau.
@@ -221,7 +221,7 @@ class Plateau(Canvas):
         Vous pouvez commencer par créer l'attribut cases en considérant qu'aucune case n'est spéciale.
         Regardez ensuite sur un vrai plateau de scrabble quelles positions sont spéciales, créer ces cases spéciales et remplacez les anciennes cases.
         """
-        super().__init__(parent, width=(nb_pixels_per_case*Plateau.DIMENSION),
+        super().__init__(parent, width=nb_pixels_per_case*Plateau.DIMENSION,
                          height=nb_pixels_per_case*Plateau.DIMENSION)
         self.parent = parent
         self.nb_pixels_per_case = nb_pixels_per_case
@@ -244,19 +244,21 @@ class Plateau(Canvas):
             self.cases[7 + i][7 + j] = Case(2, 'L')
         self.cases[7][7] = Case(2, 'M')
 
+
+        self.tag_bind("case", "<Button-1>", self.highlight_case_plateau)  # non fonctionnel à revoir
         self.bind('<Configure>', self.redimensionner)
         self.dessiner()
 
 
-#Importe de Labo 11.. a revoir:
 
     def dessiner(self):
         self.delete('case')
         self.delete('lettre')
 
+
         for i in range(Plateau.DIMENSION):
             for j in range(Plateau.DIMENSION):
-                debut_ligne, debut_colonne, fin_ligne, fin_colonne = Plateau.coord_case(i, j, self.nb_pixels_per_case)
+                debut_ligne, debut_colonne, fin_ligne, fin_colonne = coord_case(i, j, self.nb_pixels_per_case)
 
                 # On dessine le rectangle. On utilise l'attribut "tags" pour être en mesure de récupérer les éléments
                 # par la suite.
@@ -272,7 +274,8 @@ class Plateau(Canvas):
                                      font=('Times', '{}'.format(int(delta/2))),
                                      justify=CENTER, text=self.cases[i][j].text_case, tags='case')
                 if not self.cases[i][j].est_vide():
-                    self.dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
+                    dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
+
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)
@@ -280,25 +283,6 @@ class Plateau(Canvas):
         self.delete('case')
         self.delete('lettre')
         self.dessiner()
-
-    @staticmethod
-    def coord_case(i, j, nb_pixels_per_case):
-        debut_ligne = i * nb_pixels_per_case
-        fin_ligne = debut_ligne + nb_pixels_per_case
-        debut_colonne = j * nb_pixels_per_case
-        fin_colonne = debut_colonne + nb_pixels_per_case
-        return debut_ligne, debut_colonne, fin_ligne, fin_colonne
-
-    def dessiner_jeton(self, jeton, i, j, nb_pixels_per_case, tag='lettre'):
-        d = int(nb_pixels_per_case / 2.0)
-        debut_ligne, debut_colonne, fin_ligne, fin_colonne = Plateau.coord_case(i, j, nb_pixels_per_case)
-        self.create_rectangle(debut_colonne, debut_ligne, fin_colonne, fin_ligne, fill='#b9936c', tags=tag)
-        self.create_text((debut_colonne + d, debut_ligne + d), font=('Times', '{}'.format(31)), text=str(jeton), tags='lettre')
-
-
-
-
-#Code original
 
     @staticmethod
     def code_position_est_valide(code):
@@ -326,10 +310,11 @@ class Plateau(Canvas):
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        assert Plateau.code_position_est_valide(code), "Le code de la position est invalide, impossible de la décodée."
-        index_ligne = ord(code[0]) - ord('A') #A étant ligne 0
-        index_colonne = int(code[1:]) - 1    #1 étant collone 0
-        return (index_ligne, index_colonne)  #retourne tuple
+        assert Plateau.code_position_est_valide(code), "Code position invalide."
+        code = code.upper()
+        index_ligne = ord(code[0]) - ord('A')
+        index_colonne = int(code[1:]) - 1
+        return index_ligne, index_colonne
 
     def case_est_vide(self, position_code):
         """
@@ -338,21 +323,15 @@ class Plateau(Canvas):
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible de vérifié si elle est vide."
-        pos_case = self.decode_position(position_code) #va chercher le tuple de la case
-        return self.cases[pos_case[0]][pos_case[1]].est_vide() # utilise le tuple dans la liste de case puis: True si vide False sinon
+        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        return self.cases[index_ligne][index_colonne].est_vide()
 
     def est_vide(self):
         """
         Permet de déterminer si le plateau est vide, c'est à dire que toutes les cases sont vides.
         :return: True si le plateau est vide, False sinon.
         """
-        # À compléter  Pas sur que la methode utilise Soit optimal.. a voir plus loin #TODO
-        for ligne in range(Plateau.DIMENSION):
-            for colonne in range(Plateau.DIMENSION):
-                if not self.cases[ligne][colonne].est_vide(): #Case non vide trouve
-                    return False
-        return True # fin de l'iteration de toutes les cases, aucune non-vide trouve
+        return all([case.est_vide() for ligne in self.cases for case in ligne])
 
     def ajouter_jeton(self, jeton, position_code):
         """
@@ -362,11 +341,9 @@ class Plateau(Canvas):
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'ajoute un jeton."
-        assert self.case_est_vide(position_code), "La case n'est pas vide, impossible d'ajoute un jeton."
-        pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        self.cases[pos_case[0]][pos_case[1]].placer_jeton(jeton)  # utilise le tuple dans la liste et ajoute le jeton a cette case
-        return
+        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        assert self.case_est_vide(position_code), 'Position occupée.'
+        self.cases[index_ligne][index_colonne].placer_jeton(jeton)
 
     def retirer_jeton(self, position_code):
         """
@@ -375,10 +352,10 @@ class Plateau(Canvas):
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert Plateau.code_position_est_valide(position_code), "Le code de la position est invalide, impossible d'enlever un jeton."
-        assert not self.case_est_vide(position_code), "La case est vide, impossible d'enlever un jeton."
-        pos_case = self.decode_position(position_code)  # va chercher le tuple de la case
-        return self.cases[pos_case[0]][pos_case[1]].retirer_jeton() #appel fonction avec le tuple de la case et retourne le jeton
+        index_ligne, index_colonne = Plateau.decode_position(position_code)
+        assert not self.case_est_vide(position_code), 'Position occupée.'
+        jeton = self.cases[index_ligne][index_colonne].retirer_jeton()
+        return jeton
 
     def cases_adjacentes_occupees(self, position_code):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -432,6 +409,10 @@ class Plateau(Canvas):
 
         return valide
 
+    def highlight_case_plateau(self, event):
+        if self.find_withtag(CURRENT):
+            self.itemconfig(CURRENT, fill="blue")
+
     def placer_mots(self, jetons_a_ajouter, position_codes):
         """
         Permet de placer plusieurs jetons sur le plateau afin de former un ou plusieurs mots.
@@ -443,10 +424,13 @@ class Plateau(Canvas):
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        assert self.valider_positions_avant_ajout(position_codes), "Les codes de position sont invalide, impossible de placer le mot."
-        for n in range(len(jetons_a_ajouter)):  # boucle entre tout les jetons disponibles pour ajout
-            self.ajouter_jeton(jetons_a_ajouter[n], position_codes[n])   # ajout des jetons a chaque pos, format fait par fonction direct
-        return self.mots_score_obtenus(position_codes) # fonction retourne liste mot + score
+        assert self.valider_positions_avant_ajout(position_codes), "Les positions pour l'ajout sont invalides."
+
+        for jeton, pos in zip(jetons_a_ajouter, position_codes):
+            self.ajouter_jeton(jeton, pos)
+
+        mots, score = self.mots_score_obtenus(position_codes)
+        return mots, score
 
     def mots_score_obtenus(self, nouvelles_positions):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -459,19 +443,19 @@ class Plateau(Canvas):
         lignes, cols = zip(*positions_decodees)
         mots = []
         for ligne in set(lignes):
-            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(nouvelles_positions, ligne)
+            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(positions_decodees, ligne)
             mots += lmots
             score_total += score
         for col in set(cols):
-            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(nouvelles_positions, colonne=col)
+            lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(positions_decodees, colonne=col)
             mots += lmots
             score_total += score
         return mots, score_total
 
-    def __mots_et_score_sur_ligne_ou_colonne(self, nouvelles_positions, ligne=None, colonne=None):
+    def __mots_et_score_sur_ligne_ou_colonne(self, positions_decodees, ligne=None, colonne=None):
         """ *** Vous n'avez pas à coder cette méthode ***
         Permet de trouver les mots sur une ligne ou une colonne et le score associé.
-        :param nouvelles_positions:  str list, liste de chaînes de caractères représentant les dernières positions où des jetons ont été ajoutés.
+        :param positions_decodees:  str list, liste de chaînes de caractères représentant les dernières positions où des jetons ont été ajoutés.
         :param ligne: (int, optionel), index de la ligne d'intérêt
         :param colonne: (int, optionel), index de la colonne d'intérêt
         :return: tuple (str list, int), la liste des mots trouvés sur la ligne ou la colonne et le score total.
@@ -480,7 +464,6 @@ class Plateau(Canvas):
         """
         assert (ligne is None) ^ (colonne is None), "Précisez seulement la ligne ou la colonne, pas les deux."
 
-        positions_decodees = [Plateau.decode_position(p) for p in nouvelles_positions]
         mots, score_total = [], 0
         mot, score_mot, multiplicateur, pos_mot = "", 0, 1, []
         for i in range(Plateau.DIMENSION):
