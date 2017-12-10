@@ -118,6 +118,11 @@ class Scrabble(Tk):
         txt = "Au tour de: {}".format(self.joueur_actif.nom)
         self.text_joueur_actif.set(txt)
 
+    def text_mot_update(self, mot):
+        # self.text_mot_place.set('{}\n'.format(mot))
+        # self.mot_place['text'].append('{}\n'.format(mot))
+        print(self.text_mot_place.get())
+        self.text_mot_place.set('{}\n{}'.format( self.text_mot_place.get(),mot))
 
     def initialiser_jeu(self, nb_joueurs, langue='fr'):
         """ *** Vous n'avez pas à coder cette méthode ***
@@ -154,6 +159,12 @@ class Scrabble(Tk):
         self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12)).grid(row=1, column=0, pady=2, padx=2)
         self.text_score_joueur = StringVar()
         self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11)).grid( row=2, column=0, pady=2, padx=2, rowspan=4)
+
+        #Init Liste mot joue
+        self.liste_label = Label(self, text="Mots Placées", fg="black", font=("Courier", 12)).grid(row=8, column=0, pady=2, padx=2)
+        self.text_mot_place = StringVar()
+        self.text_mot_place.set("")
+        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = N,fg="black", font=("Courier", 11)).grid( row=9, column=0, pady=2, padx=2, rowspan=10)
 
         # portion joueur
         self.text_joueur_actif = StringVar()
@@ -237,7 +248,8 @@ class Scrabble(Tk):
 
     def choix_changer_jeton(self,swap_jeton):
         for pos in swap_jeton:
-            self.jetons_libres.append( self.joueur_actif.retirer_jeton(int(pos) - 1))  # retire jeton et lajoute a la liste des disponibles
+            print(pos)
+            self.jetons_libres.append( self.joueur_actif.retirer_jeton(int(pos)))  # retire jeton et lajoute a la liste des disponibles
         jeton_pigee = self.tirer_jetons(len(swap_jeton))
         for i in range(0, len(jeton_pigee)):
             self.joueur_actif.ajouter_jeton(jeton_pigee[i])
@@ -289,6 +301,8 @@ class Scrabble(Tk):
         self.annonce.set('')
         self.changer_joueur = True
         self.prochain_tour()
+        for i in range(len(mots)):
+            self.text_mot_update(mots[i])
 
 
     def mot_permis(self, mot):
