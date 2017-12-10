@@ -48,7 +48,8 @@ class Scrabble(Tk):
         self.nb_pixels_per_case = 60
 
         # Bouton explication du jeu
-        self.voir_instruction = Button(self, text = "Lire instruction", command=self.lire_instruction, width=20).grid(row=3, column=7, pady=2, padx=2)
+        self.voir_instruction = Button(self, text = "Lire instruction", command=self.lire_instruction,
+                                       width=20).grid(row=3, column=7, pady=2, padx=2)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -89,7 +90,13 @@ class Scrabble(Tk):
     def lire_instruction(self):
         #fenetre de choix instruction
         self.new = Toplevel(self)
-        self.new.wm_title("Instruction", )
+        self.new.wm_title("Instruction" )
+        Label(self.new, text ="Afin de jouer à cette version de Scrabble il faudra prendre les jetons sur le chevalet "
+                              "et les disposer \n sur le plateau de jeu puis cliquer sur terminer tour. Lorsque vous "
+                              "souhaitez changer vos jetons il faudra les prendre \n et les déposer dans le rectangle "
+                              "intitulé 'Changer jetons' puis cliquer sur terminer tour. \n Pour passer, cliquez sur "
+                              "terminer tour et pour abandonner cliquez sur abandonner. "
+                              "\n Bonne partie! ").grid(row = 0, column = 0)
 
 
     def nouvelle_partie(self):
@@ -454,7 +461,6 @@ class Scrabble(Tk):
                 (s) pour sauvegarder ou (q) pour quitter"
             Notez que si le joueur fait juste sauvegarder on ne doit pas passer au joueur suivant mais dans tous les autres cas on doit passer au joueur suivant. S'il quitte la partie on l'enlève de la liste des joueurs.
         Une fois la partie terminée, on félicite le joueur gagnant!
-
         :return Ne retourne rien.
         """
         abandon = False
