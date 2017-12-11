@@ -246,21 +246,6 @@ class Plateau(Canvas):
         self.bind('<Configure>', self.redimensionner)
         self.dessiner()
 
-    # cree pour TP4 #TODO DELETE now in class in util
-    # def move_jeton(self,event):
-    #     print('move!')
-    #     print(event)
-    #     moving_jeton = self.find_withtag(CURRENT)
-    #     if self.move_flag:
-    #         new_xpos, new_ypos = event.x, event.y
-    #         self.move(moving_jeton, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
-    #         self.mouse_xpos = new_xpos
-    #         self.mouse_ypos = new_ypos
-    #     else:
-    #         self.move_flag = True
-    #         self.tag_raise(moving_jeton)
-    #         self.mouse_xpos = event.x
-    #         self.mouse_ypos = event.y
 
     # revu pour TP4
     def dessiner(self):

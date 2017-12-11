@@ -30,6 +30,7 @@ class Joueur:
         self.nom = nom
         self.__points = 0
         self.__chevalet = [None] * Joueur.TAILLE_CHEVALET
+        self.temps_de_jeu = 0
 
     @property
     def nb_a_tirer(self):

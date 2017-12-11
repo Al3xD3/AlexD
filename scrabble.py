@@ -128,8 +128,38 @@ class Scrabble(Tk):
         :return str langue FR ou EN
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        #TODO effacer ancienne valeur
-        self.initialiser_jeu(self.nbre_joueur.get(), self.langue_possible[self.langue.get()][1])
+        # init joueur
+        self.changer_joueur = True
+        self.joueur_actif = None
+        # TODO Methode pour nommer nos joueur dynamiquement
+        self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(self.nbre_joueur.get())]
+        # init langue
+        langue = self.langue_possible[self.langue.get()][1]
+        if langue.upper() == 'FR':
+            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
+            data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
+                    ('R', 6, 1), ('S', 6, 1), ('T', 6, 1), ('U', 6, 1), ('L', 5, 1),
+                    ('D', 3, 2), ('M', 3, 2), ('G', 2, 2), ('B', 2, 3), ('C', 2, 3),
+                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
+                    ('Q', 1, 8), ('K', 1, 10), ('W', 1, 10), ('X', 1, 10), ('Y', 1, 10),
+                    ('Z', 1, 10)]
+            nom_fichier_dictionnaire = 'dictionnaire_francais.txt'
+        elif langue.upper() == 'EN':
+            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
+            data = [('E', 12, 1), ('A', 9, 1), ('I', 9, 1), ('N', 6, 1), ('O', 8, 1),
+                    ('R', 6, 1), ('S', 4, 1), ('T', 6, 1), ('U', 4, 1), ('L', 4, 1),
+                    ('D', 4, 2), ('M', 2, 3), ('G', 3, 2), ('B', 2, 3), ('C', 2, 3),
+                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
+                    ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
+                    ('Z', 1, 10)]
+            nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
+
+        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for i in range(occurences)]
+        with open(nom_fichier_dictionnaire, 'r') as f:
+            self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
+            # fin de l'init part a debut jeux
+
+        self.initialiser_jeu()
         self.new.destroy()
         # TODO Que doit ton reseter?
 
@@ -158,7 +188,7 @@ class Scrabble(Tk):
         print(self.text_mot_place.get())
         self.text_mot_place.set('{}\n{}'.format( self.text_mot_place.get(),mot))
 
-    def initialiser_jeu(self, nb_joueurs, langue='fr'):
+    def initialiser_jeu(self):
         """ *** Vous n'avez pas à coder cette méthode ***
         Étant donnés un nombre de joueurs et une langue. Le constructeur crée une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -185,11 +215,6 @@ class Scrabble(Tk):
         self.plateau.grid(row=1, column=2, columnspan=4, rowspan=18)
         #self.plateau.grid(row=0, column=0, sticky=NSEW)
 
-        # init joueur
-        self.changer_joueur = True
-        self.joueur_actif = None
-        # TODO Methode pour nommer nos joueur dynamiquement
-        self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
 
         # init score board
         self.score_label = Label(self, text="Tableau des Résultats", fg="black", font=("Courier", 12))
@@ -235,31 +260,7 @@ class Scrabble(Tk):
         self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6))
         self.score_label.grid(row=23, column=6, pady=2, padx=2, columnspan=2)
 
-        # init langue
-        if langue.upper() == 'FR':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
-                    ('R', 6, 1), ('S', 6, 1), ('T', 6, 1), ('U', 6, 1), ('L', 5, 1),
-                    ('D', 3, 2), ('M', 3, 2), ('G', 2, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 8), ('K', 1, 10), ('W', 1, 10), ('X', 1, 10), ('Y', 1, 10),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_francais.txt'
-        elif langue.upper() == 'EN':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 12, 1), ('A', 9, 1), ('I', 9, 1), ('N', 6, 1), ('O', 8, 1),
-                    ('R', 6, 1), ('S', 4, 1), ('T', 6, 1), ('U', 4, 1), ('L', 4, 1),
-                    ('D', 4, 2), ('M', 2, 3), ('G', 3, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
-
-        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for i in range(occurences)]
-        with open(nom_fichier_dictionnaire, 'r') as f:
-            self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
-            # fin de l'init part a debut jeux
-            self.debut_jeux()
+        self.debut_jeux()
 
     # -------------------------------------  Fin d<init jeux ----------------------------------------
 
@@ -418,8 +419,6 @@ class Scrabble(Tk):
         """
         global start_time
         elapsed_time = time() - start_time
-
-
         if self.joueur_actif is None:
             self.joueur_actif = self.joueurs[randint(0, len(self.joueurs) - 1)]
         else:
@@ -584,7 +583,7 @@ class Scrabble(Tk):
         # try:
         with open("zzzzz", "rb") as f:
             self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases = pickle.load(f)
-        self.debut_jeux()
+        self.initialiser_jeu()
 
 
 
