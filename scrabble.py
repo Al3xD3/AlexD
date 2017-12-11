@@ -5,6 +5,7 @@ from plateau import Plateau, Jeton
 from tkinter import *
 from tkinter import messagebox
 from utils import jeton_chev
+from time import *
 
 
 class Scrabble(Tk):
@@ -104,7 +105,7 @@ class Scrabble(Tk):
         
         - Vous devez disposer les jetons sur le plateau pour placer un mot.
         
-        - Pour changer vos jetons, il vous faudra les déposées dans le rectangle intitulé 'Changer jetons'.
+        - Pour changer vos jetons, il vous faudra les déposer dans le rectangle intitulé 'Changer jetons'.
         
         - Pour sauter votre tour, conserver les jetons sur votre chevalet
 
@@ -140,6 +141,12 @@ class Scrabble(Tk):
         for joueur in self.joueurs:
             txt += '{} :  {} points\n'.format(joueur.nom, joueur.points)
             self.text_score_joueur.set(txt)
+
+    def compteur_update(self):
+        txt = ""
+        for joueur in self.joueurs:
+            txt += "{} : {} minutes(s)\n".format(joueur.nom, round(float(joueur.temps_de_jeu/60),1))
+            self.text_temps_joueur.set(txt)
 
     def joueur_actif_update(self):
         txt = "Au tour de: {}".format(self.joueur_actif.nom)
@@ -192,12 +199,23 @@ class Scrabble(Tk):
         self.score_joueur.grid( row=2, column=0, pady=2, padx=2, rowspan=4)
 
         #Init Liste mot joue
-        self.liste_label = Label(self, text="Mots Placées", fg="black", font=("Courier", 12))
+        self.liste_label = Label(self, text="Mots Placés", fg="black", font=("Courier", 12))
         self.liste_label.grid(row=8, column=0, pady=2, padx=2)
         self.text_mot_place = StringVar()
         self.text_mot_place.set("")
         self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = S,fg="black", font=("Courier", 11))
         self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=1)
+
+
+        # init le compteur de temps
+        self.compteur_label = Label(self, text="Temps de jeu", fg="black", font=("Courrier", 12))
+        self.compteur_label.grid(row=5, column=7, pady=2, padx=2)
+        self.text_temps_joueur = StringVar()
+        self.temps_joueur = Label(self, textvariable=self.text_temps_joueur, fg="black", font=("Courier", 11))
+        # self.text_score_joueur = StringVar()
+        # self.score_joueur = Label(self, textvariable=self.text_score_joueur, fg="black", font=("Courier", 11))
+        self.temps_joueur.grid(row=6, column=7, pady=2, padx=2, rowspan=4)
+
 
         # portion joueur
         self.text_joueur_actif = StringVar()
@@ -246,6 +264,8 @@ class Scrabble(Tk):
     # -------------------------------------  Fin d<init jeux ----------------------------------------
 
     def debut_jeux(self):
+        global start_time
+        start_time = time()
         if self.joueur_actif == None:
             self.joueur_suivant()
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
@@ -269,6 +289,7 @@ class Scrabble(Tk):
     def update_board(self):
         self.joueur_actif_update()
         self.score_board_update()
+        self.compteur_update()
 
     def choix_passer_tour(self):
         self.changer_joueur = True
@@ -395,9 +416,15 @@ class Scrabble(Tk):
         Le nouveau joueur actif est celui à l'index du (joueur courant + 1)% nb_joueurs.
         Si on n'a aucun joueur actif, on détermine au harsard le suivant.
         """
+        global start_time
+        elapsed_time = time() - start_time
+
+
         if self.joueur_actif is None:
             self.joueur_actif = self.joueurs[randint(0, len(self.joueurs) - 1)]
         else:
+            self.joueur_actif.temps_de_jeu += elapsed_time
+            start_time = time()
             self.joueur_actif = self.joueurs[(self.joueurs.index(self.joueur_actif) + 1) % len(self.joueurs)]
 
         if self.joueur_actif.nb_a_tirer > 0:
@@ -541,22 +568,24 @@ class Scrabble(Tk):
         # TODO methode pour avoir un input du fichier
         try:
             with open("zzzzz", "wb") as f:
-                pickle.dump(self, f)
+                #pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.text_joueur_actif, self.text_temps_joueur], f)
+                pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases], f)
         except:
             return False
         return True
-
-    @staticmethod
-    def charger_partie():
+    #@staticmethod
+    def charger_partie(self):
         """ *** Vous n'avez pas à coder cette méthode ***
         Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
         lequel l'objet avait été sauvegardé précédemment. Pensez à utiliser la fonction load du module pickle.
         :return: Scrabble, l'objet chargé en mémoire.
         """
-        # TODO methode pour avoir un input du fichier
+        # TODO methode pour avoir un input du fichie
+        # try:
         with open("zzzzz", "rb") as f:
-            objet = pickle.load(f)
-        return objet
+            self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases = pickle.load(f)
+        self.debut_jeux()
+
 
 
 if __name__ == '__main__':
