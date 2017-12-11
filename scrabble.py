@@ -3,9 +3,9 @@ from random import randint, shuffle, seed, choice
 from Joueur import Joueur
 from plateau import Plateau, Jeton
 from tkinter import *
-from tkinter import messagebox
 from utils import jeton_chev
 from time import *
+from tkinter.filedialog import *
 
 
 class Scrabble(Tk):
@@ -183,9 +183,6 @@ class Scrabble(Tk):
         self.text_joueur_actif.set(txt)
 
     def text_mot_update(self, mot):
-        # self.text_mot_place.set('{}\n'.format(mot))
-        # self.mot_place['text'].append('{}\n'.format(mot))
-        print(self.text_mot_place.get())
         self.text_mot_place.set('{}\n{}'.format( self.text_mot_place.get(),mot))
 
     def initialiser_jeu(self):
@@ -227,8 +224,8 @@ class Scrabble(Tk):
         self.liste_label.grid(row=8, column=0, pady=2, padx=2)
         self.text_mot_place = StringVar()
         self.text_mot_place.set("")
-        self.mot_place = Label(self, textvariable=self.text_mot_place, anchor = S,fg="black", font=("Courier", 11))
-        self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=1)
+        self.mot_place = Label(self, textvariable=self.text_mot_place, fg="black", font=("Courier", 11))
+        self.mot_place.grid( row=9, column=0, pady=2, padx=2, rowspan=1,sticky=N)
 
 
         # init le compteur de temps
@@ -565,30 +562,32 @@ class Scrabble(Tk):
         La sauvegarde se fera grâce à la fonction dump du module pickle.
         :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
         """
-        # TODO methode pour avoir un input du fichier
-        try:
-            with open("zzzzz", "wb") as f:
-                #pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.text_joueur_actif, self.text_temps_joueur], f)
-                pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases, self.dictionnaire, self.jetons_libres], f)
-        except:
-            return False
-        return True
+        filepath = asksaveasfilename(title="Sauvegarder une partie de Supper Scrabble", filetypes=[('Super Scrabble Save', '.sss'), ('all files', '.*')])
+        filepath += '.sss'
+        if filepath != ".sss":
+            try:
+                with open(filepath, "wb") as f:
+                    pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases, self.dictionnaire, self.text_mot_place.get()], f)
+            except:
+                return False
+            return True
+        return False
     #@staticmethod
     def charger_partie(self):
         """ *** Vous n'avez pas à coder cette méthode ***
         Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
         lequel l'objet avait été sauvegardé précédemment. Pensez à utiliser la fonction load du module pickle.
-        :return: Scrabble, l'objet chargé en mémoire.
+        :return: .
         """
-        # TODO methode pour avoir un input du fichie
-        # try:
-        with open("zzzzz", "rb") as f:
-            self.joueurs, self.joueur_actif, self.jetons_libres, cases,  self.dictionnaire, self.jetons_libres = pickle.load(f)
-        self.changer_joueur = False
-        self.fresh_load = True
-        self.plateau = Plateau(self, 30, self.fresh_load,cases)
-        self.initialiser_jeu()
-
+        filepath = askopenfilename(title="Charger une partie de Supper Scrabble", filetypes=[('Super Scrabble Save', '.sss'), ('all files', '.*')])
+        if filepath != "":
+            with open(filepath, "rb") as f:
+                self.joueurs, self.joueur_actif, self.jetons_libres, cases,  self.dictionnaire, text_mot_place = pickle.load(f)
+            self.changer_joueur = False
+            self.fresh_load = True
+            self.plateau = Plateau(self, 30, self.fresh_load,cases)
+            self.initialiser_jeu()
+            self.text_mot_place.set(text_mot_place)
 
 
 if __name__ == '__main__':

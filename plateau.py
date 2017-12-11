@@ -229,7 +229,6 @@ class Plateau(Canvas):
         if fresh_load == True:
             self.cases = cases
         else:
-            print('init case')
             self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
             for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
                 self.cases[i][j] = Case(3, 'M')
