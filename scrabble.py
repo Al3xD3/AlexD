@@ -32,6 +32,7 @@ class Scrabble(Tk):
         #x = (ws / 2) - (w / 2)
         #y = (hs / 2) - (h / 2)
         #self.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.fresh_load = False
 
         # Param des functions de classe
         self.langue_possible = [('Français', 'FR'), ('English', 'EN'), ('Dansk', 'DA')]
@@ -54,9 +55,6 @@ class Scrabble(Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.plateau = Plateau(self, self.nb_pixels_per_case)
-        canvas1 = self.plateau
-        #self.plateau.grid(row=0, column=0, sticky=NSEW)
 
         self.chevalet = Canvas(self, height=self.nb_pixels_per_case,
                                       width=7*self.nb_pixels_per_case, bg='#645b4b')
@@ -128,6 +126,8 @@ class Scrabble(Tk):
         :return str langue FR ou EN
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
+        #init plateau
+        self.plateau = Plateau(self, 30)
         # init joueur
         self.changer_joueur = True
         self.joueur_actif = None
@@ -211,7 +211,6 @@ class Scrabble(Tk):
         # replace le layout pour debut parti
         self.titre_top['text'] = "Mon Super Scrabble"
         self.titre_top.grid(row=0, column=2, columnspan=4, rowspan=1)
-        self.plateau = Plateau(self, 30)
         self.plateau.grid(row=1, column=2, columnspan=4, rowspan=18)
         #self.plateau.grid(row=0, column=0, sticky=NSEW)
 
@@ -260,6 +259,11 @@ class Scrabble(Tk):
         self.score_label = Label(self, text="Creation Dec 2018", fg="black", font=("Courier", 6))
         self.score_label.grid(row=23, column=6, pady=2, padx=2, columnspan=2)
 
+        #c,est parti
+        if self.fresh_load == True:
+            self.fresh_load = False
+            self.plateau.dessiner()
+            self.dessiner_chevalet()
         self.debut_jeux()
 
     # -------------------------------------  Fin d<init jeux ----------------------------------------
@@ -278,9 +282,6 @@ class Scrabble(Tk):
         self.plateau.dessiner()
         # Verif si fin de parti
         self.partie_terminee()
-        # if self.partie_terminee():
-        #     self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
-        #     self.determiner_gagnant()
         if self.changer_joueur:
             self.joueur_suivant()
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
@@ -568,7 +569,7 @@ class Scrabble(Tk):
         try:
             with open("zzzzz", "wb") as f:
                 #pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.text_joueur_actif, self.text_temps_joueur], f)
-                pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases], f)
+                pickle.dump([self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases, self.dictionnaire, self.jetons_libres], f)
         except:
             return False
         return True
@@ -582,7 +583,10 @@ class Scrabble(Tk):
         # TODO methode pour avoir un input du fichie
         # try:
         with open("zzzzz", "rb") as f:
-            self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases = pickle.load(f)
+            self.joueurs, self.joueur_actif, self.jetons_libres, cases,  self.dictionnaire, self.jetons_libres = pickle.load(f)
+        self.changer_joueur = False
+        self.fresh_load = True
+        self.plateau = Plateau(self, 30, self.fresh_load,cases)
         self.initialiser_jeu()
 
 

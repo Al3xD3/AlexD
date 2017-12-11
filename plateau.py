@@ -214,7 +214,7 @@ class Plateau(Canvas):
 
 
     # revu pour TP4
-    def __init__(self, parent, nb_pixels_per_case):
+    def __init__(self, parent, nb_pixels_per_case,fresh_load=False,cases=None):
         """ *** Vous n'avez pas à coder cette méthode ***
         Constructeur d'un plateau.
         Pour compléter cette méthode vous devez vous référer à la configuration réelle d'un plateau de scrabble.
@@ -226,23 +226,27 @@ class Plateau(Canvas):
         self.parent = parent
         self.nb_pixels_per_case = nb_pixels_per_case
 
-        self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
-        for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
-            self.cases[i][j] = Case(3, 'M')
-        for (i, j) in [(1, 5), (1, 9), (5, 1), (5, 5), (5, 9), (5, 13),
-                       (9, 1), (9, 5), (9, 9), (9, 13), (13, 5), (13, 9)]:
-            self.cases[i][j] = Case(3, 'L')
-        for i in [1, 2, 3, 4]:
-            self.cases[i][i] = Case(2, 'M')
-            self.cases[i][Plateau.DIMENSION - i - 1] = Case(2, 'M')
-            self.cases[Plateau.DIMENSION - i - 1][Plateau.DIMENSION - i - 1] = Case(2, 'M')
-            self.cases[Plateau.DIMENSION - i - 1][i] = Case(2, 'M')
-        for i, j in [(1, 1), (4, 0), (0, 4), (5, 1), (1, 5), (7, 4)]:
-            self.cases[7 - i][7 - j] = Case(2, 'L')
-            self.cases[7 + i][7 - j] = Case(2, 'L')
-            self.cases[7 - i][7 + j] = Case(2, 'L')
-            self.cases[7 + i][7 + j] = Case(2, 'L')
-        self.cases[7][7] = Case(2, 'M')
+        if fresh_load == True:
+            self.cases = cases
+        else:
+            print('init case')
+            self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
+            for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
+                self.cases[i][j] = Case(3, 'M')
+            for (i, j) in [(1, 5), (1, 9), (5, 1), (5, 5), (5, 9), (5, 13),
+                           (9, 1), (9, 5), (9, 9), (9, 13), (13, 5), (13, 9)]:
+                self.cases[i][j] = Case(3, 'L')
+            for i in [1, 2, 3, 4]:
+                self.cases[i][i] = Case(2, 'M')
+                self.cases[i][Plateau.DIMENSION - i - 1] = Case(2, 'M')
+                self.cases[Plateau.DIMENSION - i - 1][Plateau.DIMENSION - i - 1] = Case(2, 'M')
+                self.cases[Plateau.DIMENSION - i - 1][i] = Case(2, 'M')
+            for i, j in [(1, 1), (4, 0), (0, 4), (5, 1), (1, 5), (7, 4)]:
+                self.cases[7 - i][7 - j] = Case(2, 'L')
+                self.cases[7 + i][7 - j] = Case(2, 'L')
+                self.cases[7 - i][7 + j] = Case(2, 'L')
+                self.cases[7 + i][7 + j] = Case(2, 'L')
+            self.cases[7][7] = Case(2, 'M')
         self.bind('<Configure>', self.redimensionner)
         self.dessiner()
 
@@ -251,7 +255,6 @@ class Plateau(Canvas):
     def dessiner(self):
         self.delete('case')
         self.delete('lettre')
-        # self.delete('lettreChevalet')
         for i in range(Plateau.DIMENSION):
             for j in range(Plateau.DIMENSION):
                 debut_ligne, debut_colonne, fin_ligne, fin_colonne = self.coord_case(i, j, self.nb_pixels_per_case)
@@ -274,17 +277,6 @@ class Plateau(Canvas):
         self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION - 4 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
         self.rectanlge_lac = self.create_rectangle(self.nb_pixels_per_case*(Plateau.DIMENSION - 3 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
         self.lac = self.create_text(self.nb_pixels_per_case*(Plateau.DIMENSION - 1.5 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 2), justify=CENTER, font=('Times', '{}'.format(self.nb_pixels_per_case//2)), text='Changer Jeton', tags='case',width=self.nb_pixels_per_case*3)
-
-    # Outdated remplacer par classe Jeton_chev #TODO DElete
-    # def dessiner_jeton_chevalet(self, jeton, number):
-    #     poschevalet = self.coords(self.chevalet)
-    #     offsetH = self.nb_pixels_per_case // 2
-    #     debut_x = poschevalet[0] + self.nb_pixels_per_case * ( number*2 + 1)
-    #     debut_y = poschevalet[1] + offsetH
-    #     fin_x = debut_x + self.nb_pixels_per_case
-    #     fin_y = debut_y + self.nb_pixels_per_case
-    #     self.create_rectangle(debut_x, debut_y, fin_x, fin_y, fill='#b9936c', tags='lettreChevalet{}'.format(number))
-    #     self.create_text((debut_x + offsetH, debut_y + offsetH), font=('Times', '{}'.format(self.nb_pixels_per_case - 7)), text=str(jeton), tags='lettreChevalet{}'.format(number))
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)
