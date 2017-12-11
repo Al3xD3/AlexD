@@ -396,8 +396,6 @@ class Scrabble(Tk):
         """
         if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
             self.titre_top['text'] = "Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant())
-            # self.annonce.set("Félicitation à {} qui a remporté la victoire".format(self.determiner_gagnant()))
-            #on vient effacer l<affichage
             self.boutton_placer.destroy()
             self.boutton_abandonner.destroy()
             self.plateau.destroy()
@@ -405,9 +403,19 @@ class Scrabble(Tk):
             self.mot_place.destroy()
             self.joueur_actif_label.destroy()
             self.annonce_label.destroy()
-
             return True
         return False
+
+
+#function inutilis/, #TODO DELETE
+    def destroy_gui(self):
+        self.boutton_placer.destroy()
+        self.boutton_abandonner.destroy()
+        self.plateau.destroy()
+        self.liste_label.destroy()
+        self.mot_place.destroy()
+        self.joueur_actif_label.destroy()
+        self.annonce_label.destroy()
 
     def joueur_suivant(self):
         """

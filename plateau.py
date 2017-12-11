@@ -432,8 +432,9 @@ class Plateau(Canvas):
         """
         for jeton, pos in zip(jetons_a_ajouter, position_codes):
             self.ajouter_jeton(jeton, pos)
-
         mots, score = self.mots_score_obtenus(position_codes)
+        if mots == [] and self.decode_position(position_codes[0]) == (7, 7) and len(position_codes) == 1: #cas de 1 lettre au depart
+            mots,score = [str(jetons_a_ajouter[0].lettre)],jetons_a_ajouter[0].valeur * 2
         return mots, score
 
     def mots_score_obtenus(self, nouvelles_positions):
@@ -454,6 +455,7 @@ class Plateau(Canvas):
             lmots, score = self.__mots_et_score_sur_ligne_ou_colonne(positions_decodees, colonne=col)
             mots += lmots
             score_total += score
+
         return mots, score_total
 
     def __mots_et_score_sur_ligne_ou_colonne(self, positions_decodees, ligne=None, colonne=None):
