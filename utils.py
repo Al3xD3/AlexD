@@ -33,7 +33,6 @@ class jeton_chev(object):
         self.move_flag = False
         self.position = number
         self.size = size
-        #debug
         self.nom = str(jeton)
 
 
@@ -42,7 +41,7 @@ class jeton_chev(object):
     def move(self, event):
         if self.move_flag:
             new_xpos, new_ypos = event.x, event.y
-            if new_xpos > 5 and new_xpos < self.size//2 * 15 and new_ypos > 5 and new_ypos < self.size//2 * 18: #reste dans canvas
+            if new_xpos > 5 and new_xpos < self.size//2 * 15 and new_ypos > 5 and new_ypos < self.size//2 * 18: # fait en sorte que les jetons restent dans canvas en limitant le mouvement de ceux-ci au canvas
                 self.canvas.move(self.border, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
                 self.canvas.move(self.texte, new_xpos - self.mouse_xpos, new_ypos - self.mouse_ypos)
                 self.mouse_xpos = new_xpos

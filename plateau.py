@@ -1,10 +1,20 @@
 from tkinter import *
+class PositionInvalideException(Exception):
+    pass
+
+class MotNonPermisException(Exception):
+    pass
+
+class CaseOccupeeException(Exception):
+    pass
+
+class CaseVideException(Exception):
+    pass
 
 
 class Jeton:
     """
     Cette classe représente un jeton.
-
     Les attributs d'un jeton sont:
     - lettre: str, représentant la lettre écrite sur le jeton. Par convention toutes les lettres au scrabble sont en majuscules. Dans ce travail nous ne considérons pas les jetons jokers qui n'ont aucune lettre inscrite.
     - valeur: int, compris entre 0 et 20 inclusivement et représentant le nombre de points associé au jeton.
@@ -38,7 +48,6 @@ class Jeton:
 class Case:
     """
     Cette classe représente une case sur un tableau de scrabble.
-
     Les attributs d'une case sont:
     - multiplicateur: int, >= 1 et <= 3.
                         Si la case n'est pas spéciale son multiplicateur de points est de 1.
@@ -79,8 +88,10 @@ class Case:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la case est déjà occupée.
         """
-        assert self.est_vide(), "Case non vide."
-        self.jeton_occupant = jeton
+        try:
+            self.jeton_occupant = jeton
+        except:
+            raise CaseOccupeeException ("La case est occupée")
 
     def retirer_jeton(self):
         """
@@ -88,10 +99,13 @@ class Case:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "Case vide."
-        jeton = self.jeton_occupant
-        self.jeton_occupant = None
-        return jeton
+
+        try:
+            jeton = self.jeton_occupant
+            self.jeton_occupant = None
+            return jeton
+        except:
+            raise CaseVideException ("La case est vide")
 
     def valeur_jeton(self):
         """
@@ -99,17 +113,20 @@ class Case:
         :return: int, valeur du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "Aucun jeton dans la case."
-        return self.jeton_occupant.valeur
-
+        try:
+            return self.jeton_occupant.valeur
+        except:
+            raise CaseVideException ("La case est vide")
     def lettre_jeton(self):
         """
         Permet de trouver la lettre inscrite sur le jeton dans la case.
         :return: str, lettre du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "Aucun jeton dans la case."
-        return self.jeton_occupant.lettre
+        try:
+            return self.jeton_occupant.lettre
+        except:
+            raise CaseVideException ("La case est vide")
 
     @property
     def code_couleur(self):
@@ -191,17 +208,14 @@ class Plateau(Canvas):
         O |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    | O
           +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
              1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
-
     Nous avons un attribut de classe:
     - DIMENSION qui représente la dimension (nombre de lignes ou de colonnes) pour le plateu de scrabble. Par défaut sa valeur est de 15.
-
     Un plateau de scrabble a pour attribut:
     - cases: Case list list, une liste de liste de cases.
             Le programmeur peut avoir accès et manipuler les cases du plateau avec des indexes i et j, tels que 0 <= i < Plateau.DIMENSION et 0 <= i < Plateau.DIMENSION.
             Pour vous aider un peu:
                 * cases[i] vous retourne la i+1 ème ligne du plateau. (L'index i == 0 correspond donc à la première ligne, et ainsi de suite).
                 * cases[i][j] vous donne la case au croisement de la i+1 ème ligne et de la j+1 ème colonne du plateau. (L'index j == 0 correspond donc à la première colonne, et ainsi de suite).
-
             L'utilisateur de la classe, désignera les cases grâce à un code au format « XY » où X représente une lettre comprise entre 'A' et 'O', et Y un nombre compris entre 1 et 15. Ex: K9, E15.
             - La lettre désigne une ligne: 'A' pour la 1ère ligne, B pour la seconde ligne, etc.
             - Le nombre désigne une colonne: 5 correspond à la 5ème colonne.
@@ -213,7 +227,6 @@ class Plateau(Canvas):
     DIMENSION = 15
 
 
-    # revu pour TP4
     def __init__(self, parent, nb_pixels_per_case,fresh_load=False,cases=None):
         """ *** Vous n'avez pas à coder cette méthode ***
         Constructeur d'un plateau.
@@ -250,7 +263,6 @@ class Plateau(Canvas):
         self.dessiner()
 
 
-    # revu pour TP4
     def dessiner(self):
         self.delete('case')
         self.delete('lettre')
@@ -272,7 +284,6 @@ class Plateau(Canvas):
                                      justify=CENTER, text=self.cases[i][j].text_case, tags='case')
                 if not self.cases[i][j].est_vide():
                     self.dessiner_jeton(self.cases[i][j].jeton_occupant, i, j, self.nb_pixels_per_case)
-        #Essaie d'integration chevalet dans canvas
         self.chevalet = self.create_rectangle(2,self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION - 4 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
         self.rectanlge_lac = self.create_rectangle(self.nb_pixels_per_case*(Plateau.DIMENSION - 3 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 1),self.nb_pixels_per_case*(Plateau.DIMENSION ),self.nb_pixels_per_case*(Plateau.DIMENSION + 3))
         self.lac = self.create_text(self.nb_pixels_per_case*(Plateau.DIMENSION - 1.5 ),self.nb_pixels_per_case*(Plateau.DIMENSION + 2), justify=CENTER, font=('Times', '{}'.format(self.nb_pixels_per_case//2)), text='Changer Jeton', tags='case',width=self.nb_pixels_per_case*3)
@@ -282,10 +293,9 @@ class Plateau(Canvas):
         self.nb_pixels_per_case = new_dim // Plateau.DIMENSION
         self.delete('case')
         self.delete('lettre')
-        # self.delete('lettreChevalet')
         self.dessiner()
 
-    # revu pour TP4
+
     def code_position_est_valide(self, code):
         """ *** Vous n'avez pas à coder cette méthode ***
         Méthode statique permettant de valider si un code de positionnement sur le tableau est valide ou pas.
@@ -297,27 +307,28 @@ class Plateau(Canvas):
                 return True
             return False
 
-    # revu pour TP4
     def decode_position(self,code):
         """
         Méthode statique servant à transformer un code de positionnement sur le plateau
         en index d'accès de ligne et de colonne sur le plateau.
-
         :param s: liste contenant int [x,y] représentant un code de positionnement.
-
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        assert self.code_position_est_valide(code), "Code position invalide."
-        index_ligne = code[1]//self.nb_pixels_per_case - 1
-        index_colonne = code[0]//self.nb_pixels_per_case - 1
-        return (index_ligne, index_colonne)
+        try:
+            index_ligne = code[1]//self.nb_pixels_per_case - 1
+            index_colonne = code[0]//self.nb_pixels_per_case - 1
+            return (index_ligne, index_colonne)
+        except:
+            raise PositionInvalideException ("Position invalide")
 
-    def coord_case(self, i, j, nb_pixels_per_case):
-        debut_ligne = i * nb_pixels_per_case + 2
-        fin_ligne = debut_ligne + nb_pixels_per_case + 2
-        debut_colonne = j * nb_pixels_per_case + 2
-        fin_colonne = debut_colonne + nb_pixels_per_case + 2
+    def coord_case(self, i, j, nb_pixels_per_case): #permet de déterminer lors de son utilisation si un jetons est sur
+        #cette case plutôt qu'une autre
+
+        debut_ligne = i * nb_pixels_per_case + 2 #détermine le début de la ligne de la case
+        fin_ligne = debut_ligne + nb_pixels_per_case + 2 #détermine la fin de la ligne de la case
+        debut_colonne = j * nb_pixels_per_case + 2 #détermine le début de la ligne de la case
+        fin_colonne = debut_colonne + nb_pixels_per_case + 2 #détermine la fin de la colonne de la case
         return debut_ligne, debut_colonne, fin_ligne, fin_colonne
 
     def dessiner_jeton(self, jeton, i, j, nb_pixels_per_case, tag='lettre'):
@@ -352,8 +363,10 @@ class Plateau(Canvas):
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
         index_ligne, index_colonne = self.decode_position(position_code)
-        assert self.case_est_vide(position_code), 'Position occupée.'
-        self.cases[index_ligne][index_colonne].placer_jeton(jeton)
+        try: # tente en premier lieu de placer le jeton sur la case sélectionnée
+            self.cases[index_ligne][index_colonne].placer_jeton(jeton)
+        except: #si ne fonctionne pas, va lever exception
+            raise CaseOccupeeException ("la case est occupée")
 
     def retirer_jeton(self, position_code):
         """
@@ -363,10 +376,11 @@ class Plateau(Canvas):
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
         index_ligne, index_colonne = self.decode_position(position_code)
-        assert not self.case_est_vide(position_code), 'Position occupée.'
-        jeton = self.cases[index_ligne][index_colonne].retirer_jeton()
-        return jeton
-
+        try: #tente de retirer le jeton de la case donnée
+            jeton = self.cases[index_ligne][index_colonne].retirer_jeton()
+            return jeton
+        except: #leve une exception si la case est occupée
+            raise CaseOccupeeException ("la case est occupée")
     def cases_adjacentes_occupees(self, position_code):
         """ *** Vous n'avez pas à coder cette méthode ***
         Étant donnée une position, cette méthode permet de voir si au moins l'une de ses positions voisines est occupée.
@@ -430,7 +444,7 @@ class Plateau(Canvas):
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        for jeton, pos in zip(jetons_a_ajouter, position_codes):
+        for jeton, pos in zip(jetons_a_ajouter, position_codes): #pour chaque jeton à ajouter déterminer le score et déterminer si c'Est un mot valide
             self.ajouter_jeton(jeton, pos)
         mots, score = self.mots_score_obtenus(position_codes)
         if mots == [] and self.decode_position(position_codes[0]) == (7, 7) and len(position_codes) == 1: #cas de 1 lettre au depart

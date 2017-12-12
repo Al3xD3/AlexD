@@ -1,13 +1,26 @@
 from random import shuffle
 
+class PositionInvalideException(Exception):
+    pass
+
+class MotNonPermisException(Exception):
+    pass
+
+class CaseOccupeeException(Exception):
+    pass
+
+class CaseVideException(Exception):
+    pass
+
+
+class NomDoitEtreVide(Exception):
+    pass
 
 class Joueur:
     """
     Cette classe permet de représenter un joueur.
-
     La classe joueur possède une variable de classe:
     - TAILLE_CHEVALET : le nombre de jetons maximum qu'un joueur peut avoir.
-
     Un joueur a 3 attributs:
     - nom (str, public): représente le nom du joueur doit être non vide
     - __points (entier, privé): représente le nombre de points que le joueur détient.
@@ -26,11 +39,13 @@ class Joueur:
         :return Ne retourne rien.
         :exception Levez une exception si le nom est une chaine vide.
         """
-        assert nom != "", "Le nom doit être non vide."
-        self.nom = nom
-        self.__points = 0
-        self.__chevalet = [None] * Joueur.TAILLE_CHEVALET
-        self.temps_de_jeu = 0
+        try:
+            self.nom = nom
+            self.__points = 0
+            self.__chevalet = [None] * Joueur.TAILLE_CHEVALET
+            self.temps_de_jeu = 0
+        except:
+            raise NomDoitEtreVide("Le nom doit être non vide.")
 
     @property
     def nb_a_tirer(self):
@@ -68,8 +83,10 @@ class Joueur:
         :return: True si la position est vide et False sinon.
         :exception Levez une exception avec assert si la position n'est pas valide. Pensez à réutiliser Joueur.position_est_valide.
         """
-        assert Joueur.position_est_valide(pos), "Position invalide."
-        return self.__chevalet[pos] is None
+        try:
+            return self.__chevalet[pos] is None
+        except:
+            raise PositionInvalideException("Position invalide.")
 
     def ajouter_jeton(self, jeton, pos=None):
         """
