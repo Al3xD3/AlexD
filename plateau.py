@@ -27,8 +27,6 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        assert len(lettre) == 1 and lettre.isupper() and lettre.isalpha(), "Lettre incorrecte."
-        assert 0 <= valeur <= 20, "Valeur incorrecte."
 
         self.lettre = lettre
         self.valeur = valeur
@@ -68,8 +66,7 @@ class Case:
         :exception: Levez une exception avec assert si le multiplicateur ne respecte pas
         la condition suivante 1 <= multiplicateur <= 3 ou si le type n'est ni None, ni 'M', ni 'L'.
         """
-        assert 1 <= multiplicateur <= 3, "Multiplicateur incorrect."
-        assert type is None or type in "ML", "Type incorrect."
+
         self.multiplicateur = multiplicateur
         self.type = type
         self.jeton_occupant = None
@@ -482,7 +479,6 @@ class Plateau(Canvas):
         Plus précisément la liste devra contenir au maximum un élément car un tout nouvel ajout de jetons ne peut pas créer plus d'un mot sur la même ligne ou colonne.
         :exception: Levez une exception avec assert si la ligne et la colonne sont spécifiées ou aucun des deux ne l'est.
         """
-        assert (ligne is None) ^ (colonne is None), "Précisez seulement la ligne ou la colonne, pas les deux."
 
         mots, score_total = [], 0
         mot, score_mot, multiplicateur, pos_mot = "", 0, 1, []

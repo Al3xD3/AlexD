@@ -18,6 +18,9 @@ class CaseOccupeeException(Exception):
 
 class CaseVideException(Exception):
     pass
+class NombreDeJetonsInvalide(Exception):
+    pass
+
 
 
 class Scrabble(Tk):
@@ -81,11 +84,13 @@ class Scrabble(Tk):
         y = (hs / 2) - (h / 2)
         self.new.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.langue = IntVar()
+        self.langue.set(0) #valeur par défaut de la langue à francais
         Label(self.new, text="Langue de jeux?", justify=CENTER, padx=20).grid(row=0, column=0)
         for i in range(len(self.langue_possible)):
             Radiobutton(self.new, text=self.langue_possible[i][0], padx=20, variable=self.langue, value=i).grid(
                 row=1 + i, column=0)
         self.nbre_joueur = IntVar()
+        self.nbre_joueur.set(2) #valeur par défaut du nombre de joueur à 2
         Label(self.new, text="Nombre de joueur?", justify=CENTER, padx=20).grid(row=0, column=1)
         for i in range(2, 5):
             Radiobutton(self.new, text=str(i) + " joueurs", padx=20, variable=self.nbre_joueur, value=i).grid(row=i - 1,
@@ -444,16 +449,18 @@ class Scrabble(Tk):
         :return: Jeton list, la liste des jetons tirés.
         :exception: Levez une exception avec assert si n ne respecte pas la condition 0 <= n <= 7.
         """
-        assert 0 <= n <= 7, "Impossible de tirer les jetons, le nombre entrée est invalide"
-        if n > len(self.jetons_libres):
-            n = len(self.jetons_libres)
-        pige = []
-        shuffle(self.jetons_libres)
-        for i in range(0, n):
-            pige.append(self.jetons_libres[-1])
-            del self.jetons_libres[-1]
-            # retire premier item de la liste et l'ajoute a la pige
-        return pige
+        try:
+            if n > len(self.jetons_libres):
+                n = len(self.jetons_libres)
+            pige = []
+            shuffle(self.jetons_libres)
+            for i in range(0, n):
+                pige.append(self.jetons_libres[-1])
+                del self.jetons_libres[-1]
+                # retire premier item de la liste et l'ajoute a la pige
+            return pige
+        except:
+            raise NombreDeJetonsInvalide ("Impossible de tirer les jetons, le nombre entrée est invalide")
 
     def highlight_case_chevalet(self, event):
         global drag_id, dragged
@@ -501,16 +508,30 @@ class Scrabble(Tk):
         filepath = asksaveasfilename(title="Sauvegarder une partie de Supper Scrabble", #permet d'ouvrir une fenetre pour enregistrer la partie
                                      filetypes=[('Super Scrabble Save', '.sss'), ('all files', '.*')])
         filepath += '.sss'
-        if filepath != ".sss":
-            try:
-                with open(filepath, "wb") as f:
-                    pickle.dump(
-                        [self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases, self.dictionnaire,
-                         self.text_mot_place.get()], f) #utilise pickle pour enregistrer les infos nécéssaires dans un fichier texte
-            except:
-                return False
-            return True
-        return False
+        # if filepath != ".sss":
+        try:
+            with open(filepath, "wb") as f:
+                pickle.dump(
+                    [self.joueurs, self.joueur_actif, self.jetons_libres, self.plateau.cases, self.dictionnaire,
+                     self.text_mot_place.get()], f) #utilise pickle pour enregistrer les infos nécéssaires dans un fichier texte
+                label = Tk()
+                label.title("Toutes nos félicitations")
+                label.config(padx=20, pady=20)
+                b = Button(label, text="OK", command=label.destroy)
+                b.grid(row=2, column=0)
+                c = Label(label, text="Votre fichier a été sauvegardé avec succès", padx=20, pady=20)
+                c.grid(row=0, column=0)
+
+        except:
+            label = Tk()
+            label.title("Erreur!")
+            label.config(padx=20, pady=20)
+            b = Button(label, text="OK", command=label.destroy)
+            b.grid(row=2, column=0)
+            c = Label(label, text="Votre fichier n'a pas pu être sauvegardé", padx=20, pady=20)
+            c.grid(row=0, column=0)
+    #     return True
+    # return False
 
     # @staticmethod
     def charger_partie(self):
@@ -519,17 +540,34 @@ class Scrabble(Tk):
         lequel l'objet avait été sauvegardé précédemment. Pensez à utiliser la fonction load du module pickle.
         :return: .
         """
-        filepath = askopenfilename(title="Charger une partie de Supper Scrabble", #ouvre le finder pour sélectionner fichier
-                                   filetypes=[('Super Scrabble Save', '.sss'), ('all files', '.*')])
-        if filepath != "":
-            with open(filepath, "rb") as f:
-                self.joueurs, self.joueur_actif, self.jetons_libres, cases, self.dictionnaire, text_mot_place = pickle.load(
-                    f) #charges les informations pertinentes qui caractérise la partie qui a été enregistrée
-            self.changer_joueur = False
-            self.fresh_load = True
-            self.plateau = Plateau(self, 30, self.fresh_load, cases)
-            self.initialiser_jeu()
-            self.text_mot_place.set(text_mot_place)
+        try:
+            filepath = askopenfilename(title="Charger une partie de Supper Scrabble", #ouvre le finder pour sélectionner fichier
+                                       filetypes=[('Super Scrabble Save', '.sss'), ('all files', '.*')])
+            if filepath != "":
+                label = Tk()
+                label.title("Toutes nos félicitations")
+                label.config(padx=20, pady=20)
+                b = Button(label, text="OK", command=label.destroy)
+                b.grid(row=2, column=0)
+                c = Label(label, text="Votre fichier a été chargé!", padx=20, pady=20)
+                c.grid(row=0, column=0)
+                with open(filepath, "rb") as f:
+                    self.joueurs, self.joueur_actif, self.jetons_libres, cases, self.dictionnaire, text_mot_place = pickle.load(
+                        f) #charges les informations pertinentes qui caractérise la partie qui a été enregistrée
+                self.changer_joueur = False
+                self.fresh_load = True
+                self.plateau = Plateau(self, 30, self.fresh_load, cases)
+                self.initialiser_jeu()
+                self.text_mot_place.set(text_mot_place)
+        except:
+            master = Tk()
+            master.title("Intervention requise!")
+            master.config(padx=20, pady=20)
+            b = Button(master, text="OK", command=master.destroy)
+            b.grid(row=2, column=0)
+            c = Label(master, text="Veuillez selectionner un fichier valide", padx=20, pady=20)
+            c.grid(row=0, column=0)
+
 
 
 if __name__ == '__main__':
